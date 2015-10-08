@@ -987,7 +987,7 @@ function call(r::ArbField, x::Irrational)
   if x == pi
     return const_pi(r)
   elseif x == e
-    return const_e(r.prec)
+    return const_e(r)
   else
     error("constant not supported")
   end
