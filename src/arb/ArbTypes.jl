@@ -7,7 +7,7 @@
 #
 ###############################################################################
 
-export ArbField, arb, AcbField, acb
+export ArbField, arb, AcbField, acb, ArbMatSpace, arb_mat
 
 arb_check_prec(p::Int) = (p >= 2 && p < (typemax(Int) >> 4)) || throw(ArgumentError("invalid precision"))
 
@@ -329,5 +329,80 @@ function deepcopy(a::acb)
   b = parent(a)()
   ccall((:acb_set, :libarb), Void, (Ptr{acb}, Ptr{acb}), &b, &a)
   return b
+end
+
+
+################################################################################
+#
+#  Types and memory management for ArbMatSpace
+#
+################################################################################
+
+const ArbMatSpaceID = ObjectIdDict()
+
+type ArbMatSpace <: Ring{Arb}
+  rows::Int
+  cols::Int
+  base_ring::ArbField
+
+  function ArbMatSpace(R::ArbField, r::Int, c::Int)
+    if haskey(ArbMatSpaceID, (R, r, c))
+      return ArbMatSpaceID[(R, r, c)]::ArbMatSpace
+    else
+      z = new(r, c, R)
+      ArbMatSpaceID[(R, r, c)] = z
+      return z
+    end
+  end
+end
+
+type arb_mat <: MatElem{arb}
+  entries::Ptr{Void}
+  r::Int
+  c::Int
+  rows::Ptr{Void}
+  parent::ArbMatSpace
+
+  function arb_mat(r::Int, c::Int)
+    z = new()
+    ccall((:arb_mat_init, :libarb), Void, (Ptr{arb_mat}, Int, Int), &z, r, c)
+    finalizer(z, _arb_mat_clear_fn)
+    return z
+  end
+
+  function arb_mat(a::fmpz_mat)
+    z = new()
+    ccall((:arb_mat_init, :libarb), Void,
+                (Ptr{arb_mat}, Int, Int), &z, a.r, a.c)
+    ccall((:arb_mat_set_fmpz_mat, :libarb), Void,
+                (Ptr{arb_mat}, Ptr{fmpz_mat}), &z, &a)
+    finalizer(z, _arb_mat_clear_fn)
+    return z
+  end
+  
+  function arb_mat(a::fmpz_mat, prec::Int)
+    z = new()
+    ccall((:arb_mat_init, :libarb), Void,
+                (Ptr{arb_mat}, Int, Int), &z, a.r, a.c)
+    ccall((:arb_mat_set_round_fmpz_mat, :libarb), Void,
+                (Ptr{arb_mat}, Ptr{fmpz_mat}, Int), &z, &a, prec)
+    finalizer(z, _arb_mat_clear_fn)
+    return z
+  end
+  
+#  function arb_mat(a::fmpq_mat, prec::Int)
+#    z = new()
+#    ccall((:arb_mat_init, :libarb), Void,
+#                (Ptr{arb_mat}, Int, Int), &z, a.r, a.c)
+#    ccall((:arb_mat_set_fmpq_mat, :libarb), Void,
+#                (Ptr{arb_mat}, Ptr{fmpq_mat}, Int), &z, &a, prec)
+#    finalizer(z, _arb_mat_clear_fn)
+#    return z
+#  end
+
+end
+
+function _arb_mat_clear_fn(x::arb_mat)
+  ccall((:arb_mat_clear, :libarb), Void, (Ptr{arb_mat}, ), &x)
 end
 
