@@ -389,7 +389,7 @@ type arb_mat <: MatElem{arb}
     finalizer(z, _arb_mat_clear_fn)
     return z
   end
-  
+
 #  function arb_mat(a::fmpq_mat, prec::Int)
 #    z = new()
 #    ccall((:arb_mat_init, :libarb), Void,
@@ -399,7 +399,6 @@ type arb_mat <: MatElem{arb}
 #    finalizer(z, _arb_mat_clear_fn)
 #    return z
 #  end
-
 end
 
 function _arb_mat_clear_fn(x::arb_mat)

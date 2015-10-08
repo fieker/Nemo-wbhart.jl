@@ -6,6 +6,12 @@
 #
 ###############################################################################
 
+export parent, elem_type, prec, base_ring, cols, rows, deepcopy, getindex!,
+       setindex!, one, zero, show, strongequal, overlaps, contains, issquare,
+       transpose, bound_inf_norm, -, +, *, //,  swap_rows!, lufact!, lufact,
+       solve, solve!, solve_lu_precomp, solve_lu_precomp!, inv, det, exp, add!,
+       mul!, sub!, call, MatrixSpace
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -33,7 +39,7 @@ function deepcopy(x::arb_mat)
 end
 
 function getindex!(z::arb, x::arb_mat, r::Int, c::Int)
-  v = ccall((:arb_mat_entry, :libarb), Ptr{arb},
+  v = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
               (Ptr{arb_mat}, Int, Int), &x, r - 1, c - 1)
   ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, v)
   return z
@@ -44,7 +50,7 @@ function getindex(x::arb_mat, r::Int, c::Int)
   _checkbounds(cols(x), c) || throw(BoundsError())
 
   z = base_ring(x)()
-  v = ccall((:arb_mat_entry, :libarb), Ptr{arb},
+  v = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
               (Ptr{arb_mat}, Int, Int), &x, r - 1, c - 1)
   ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, v)
   return z
@@ -54,7 +60,7 @@ function setindex!(x::arb_mat, y::arb, r::Int, c::Int)
   _checkbounds(rows(x), r) || throw(BoundsError())
   _checkbounds(cols(x), c) || throw(BoundsError())
 
-  z = ccall((:arb_mat_entry, :libarb), Ptr{arb},
+  z = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
               (Ptr{arb_mat}, Int, Int), &x, r - 1, c - 1)
   ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb}), z, &y)
 end
@@ -62,19 +68,19 @@ end
 setindex!(x::arb_mat, y::Int, r::Int, c::Int) =
             setindex!(x, base_ring(x)(y), r, c)
 
-setindex!(x::arb_mat, y::Int, r::Int, c::UInt) =
+setindex!(x::arb_mat, y::UInt, r::Int, c::Int) =
             setindex!(x, base_ring(x)(y), r, c)
 
-setindex!(x::arb_mat, y::Int, r::Int, c::fmpz) =
+setindex!(x::arb_mat, y::fmpz, r::Int, c::Int) =
             setindex!(x, base_ring(x)(y), r, c)
 
-setindex!(x::arb_mat, y::Int, r::Int, c::fmpq) =
+setindex!(x::arb_mat, y::fmpq, r::Int, c::Int) =
             setindex!(x, base_ring(x)(y), r, c)
 
-setindex!(x::arb_mat, y::Int, r::Int, c::Float64) =
+setindex!(x::arb_mat, y::Float64, r::Int, c::Int) =
             setindex!(x, base_ring(x)(y), r, c)
 
-setindex!(x::arb_mat, y::Int, r::Int, c::AbstractString) =
+setindex!(x::arb_mat, y::AbstractString, r::Int, c::Int) =
             setindex!(x, base_ring(x)(y), r, c)
 
 function one(x::ArbMatSpace)
@@ -157,12 +163,20 @@ end
 
 ################################################################################
 #
+#  Predicates
+#
+################################################################################
+
+issquare(x::arb_mat) = cols(x) == rows(x)
+
+################################################################################
+#
 #  Transpose
 #
 ################################################################################
 
 function transpose(x::arb_mat)
-  z = MatrixSpace(parent(x), cols(x), rows(x))()
+  z = MatrixSpace(base_ring(x), cols(x), rows(x))()
   ccall((:arb_mat_transpose, :libarb), Void,
               (Ptr{arb_mat}, Ptr{arb_mat}), &z, &x)
   return z
@@ -175,16 +189,16 @@ end
 ################################################################################
 
 function bound_inf_norm(x::arb_mat)
-  zm = mag_struct()
+  z = arb()
+  t = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ptr{arb}, ), &z)
   ccall((:arb_mat_bound_inf_norm, :libarb), Void,
-              (Ptr{mag_struct}, Ptr{arb_mat}), &z, &x)
-  za = arf_struct()
+              (Ptr{mag_struct}, Ptr{arb_mat}), t, &x)
+  s = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), &z)
   ccall((:arf_set_mag, :libarb), Void,
-              (Ptr{arf_struct}, Ptr{mag_struct}), &za, &zm)
-  zar = arb()
-  ccall((:arb_set_arf, :libarb), Void,
-              (Ptr{arb}, Ptr{arf_struct}), &zar, &za)
-  return base_ring(x)(zar)
+              (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
+  ccall((:mag_zero, :libarb), Void,
+              (Ptr{mag_struct},), t)
+  return base_ring(x)(z)
 end
 
 ################################################################################
@@ -328,7 +342,6 @@ function swap_rows!(x::arb_mat, i::Int, j::Int)
   ccall((:arb_mat_swap_rows, :libarb), Void,
               (Ptr{arb_mat}, Ptr{Void}, Int, Int),
               &x, C_NULL, i - 1, j - 1)
-  nothing
 end
 
 function lufact!(P::perm, x::arb_mat)
@@ -379,7 +392,7 @@ function solve(x::arb_mat, y::arb_mat)
 end
 
 function solve_lu_precomp!(z::arb_mat, P::perm, LU::arb_mat, y::arb_mat)
-  ccall((:arb_mat_solve_lu_precomp_, :libarb), Void,
+  ccall((:arb_mat_solve_lu_precomp, :libarb), Void,
               (Ptr{arb_mat}, Ptr{Int}, Ptr{arb_mat}, Ptr{arb_mat}, Int),
               &z, P.d, &LU, &y, prec(parent(LU)))
   nothing
@@ -391,7 +404,6 @@ function solve_lu_precomp(P::perm, LU::arb_mat, y::arb_mat)
   solve_lu_precomp!(z, P, LU, y)
   return z
 end
- 
 
 function inv(x::arb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
@@ -409,7 +421,7 @@ end
 
 function det(x::arb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
-  z = base_ring(x)
+  z = base_ring(x)()
   ccall((:arb_mat_det, :libarb), Void,
               (Ptr{arb}, Ptr{arb_mat}, Int), &z, &x, prec(parent(x)))
   return z
@@ -449,8 +461,8 @@ end
 #
 ################################################################################
 
-for (s,f) in (("add!","arb_mat_add"), ("mul!","arb__mat_mul"),
-              ("sub!","arb_sub_mat"))
+for (s,f) in (("add!","arb_mat_add"), ("mul!","arb_mat_mul"),
+              ("sub!","arb_mat_sub"))
   @eval begin
     function ($(symbol(s)))(z::arb_mat, x::arb_mat, y::arb_mat)
       ccall(($f, :libarb), Void,
