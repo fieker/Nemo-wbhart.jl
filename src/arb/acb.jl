@@ -37,6 +37,27 @@ base_ring(R::AcbField) = Union{}
 
 ################################################################################
 #
+#  Conversions
+#
+################################################################################
+
+function convert(::Type{Complex128}, x::acb)
+    re = ccall((:acb_real_ptr, :libarb), Ptr{arb_struct}, (Ptr{acb}, ), &x)
+    im = ccall((:acb_imag_ptr, :libarb), Ptr{arb_struct}, (Ptr{acb}, ), &x)
+    t = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), re)
+    u = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), im)
+    # 4 == round to nearest
+    v = ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), t, 4)
+    w = ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), u, 4)
+    return complex(v, w)
+end
+
+#function convert(::Type{Complex128}, x::acb)
+#    return complex(Float64(real(x)), Float64(imag(x)))
+#end
+
+################################################################################
+#
 #  Real and imaginary part
 #
 ################################################################################
@@ -60,6 +81,12 @@ end
 #  String I/O
 #
 ################################################################################
+
+function show(io::IO, x::AcbField)
+  print(io, "Complex Field with ")
+  print(io, prec(x))
+  print(io, " bits of precision and error bounds")
+end
 
 function show(io::IO, x::acb)
   show(io, real(x))
@@ -217,7 +244,8 @@ end
 
 function unique_integer(x::acb)
   z = fmpz()
-  unique = ccall((:arb_get_unique_fmpz, :libarb), Int,
+  # needs test for complex value
+  unique = ccall((:acb_get_unique_fmpz, :libarb), Int,
     (Ptr{fmpz}, Ptr{acb}), &z, &x)
   return (unique != 0, z)
 end
@@ -600,7 +628,7 @@ end
 function hyperu(a::acb, b::acb, x::acb)
   z = parent(x)()
   ccall((:acb_hypgeom_u, :libarb), Void,
-              (Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Int, Int), &z, &a, &b, &x, parent(x).prec)
+              (Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Int), &z, &a, &b, &x, parent(x).prec)
   return z
 end
 
@@ -698,15 +726,20 @@ function call(r::AcbField, x::arb)
   return z
 end
 
+function call(r::AcbField, x::acb)
+  z = acb(x, r.prec)
+  z.parent = r
+  return z
+end
+
 function call(r::AcbField, x::Float64)
   R = ArbField(r.prec)
   return r(R(x))
 end
 
-function call(r::AcbField, x::arb, y::arb)
-  z = acb(x, y, r.prec)
-  z.parent = r
-  return z
+function call(r::AcbField, x::AbstractString)
+  R = ArbField(r.prec)
+  return r(R(x))
 end
 
 function call(r::AcbField, x::Int, y::Int)
@@ -715,14 +748,22 @@ function call(r::AcbField, x::Int, y::Int)
   return z
 end
 
-function call(r::AcbField, x::AbstractString)
+function call(r::AcbField, x::Union{Complex{Float64},Complex{Int}})
   R = ArbField(r.prec)
-  return r(R(x))
+  z = acb(real(x), imag(x), r.prec)
+  z.parent = r
+  return z
 end
 
-function call(r::AcbField, x::AbstractString, y::AbstractString)
+function call(r::AcbField, x::Union{Int,Float64,fmpz,fmpq,arb,AbstractString},
+                           y::Union{Int,Float64,fmpz,fmpq,arb,AbstractString})
   R = ArbField(r.prec)
   return r(R(x), R(y))
 end
 
+function call(r::AcbField, x::arb, y::arb)
+  z = acb(x, y, r.prec)
+  z.parent = r
+  return z
+end
 

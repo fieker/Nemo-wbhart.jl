@@ -29,6 +29,8 @@ export PolyElem, SeriesElem, ResidueElem, FractionElem, MatElem,
 export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
        MaximalRealSubfield, MaximalOrder, Ideal, PermutationGroup
 
+export RR, CC, RealField, ComplexField
+
 export create_accessors, get_handle, package_handle, allocatemem
 
 export flint_cleanup, flint_set_num_threads
@@ -180,6 +182,15 @@ ZZ = FlintZZ
 QQ = FlintQQ
 PadicField = FlintPadicField
 FiniteField = FlintFiniteField
+
+###############################################################################
+#
+#   Set domain for RR, CC to Arb
+#
+###############################################################################
+
+RealField = ArbField
+ComplexField = AcbField
 
 ###############################################################################
 #

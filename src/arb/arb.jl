@@ -42,88 +42,14 @@ one(R::ArbField) = R(1)
 
 ################################################################################
 #
-#  Parent object overloading
-#
-################################################################################
-
-function call(r::ArbField)
-  z = arb()
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::Int)
-  z = arb(fmpz(x), r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::UInt)
-  z = arb(fmpz(x), r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::fmpz)
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::fmpq)
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-  
-#function call(r::ArbField, x::arf)
-#  z = arb(arb(x), r.prec)
-#  z.parent = r
-#  return z
-#end
-
-function call(r::ArbField, x::Float64)
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::arb)
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::AbstractString)
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::Irrational)
-  if x == pi
-    return const_pi(r)
-  elseif x == e
-    return const_e(r.prec)
-  else
-    error("constant not supported")
-  end
-end
-
-################################################################################
-#
 #  Conversions
 #
 ################################################################################
 
 function convert(::Type{Float64}, x::arb)
-    t = arf_struct(0, 0, 0, 0)
-    t.exp = x.mid_exp
-    t.size = x.mid_size
-    t.d1 = x.mid_d1
-    t.d2 = x.mid_d2
-    # rounds to zero
-    return ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), &t, 0)
+    t = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), &x)
+    # 4 == round to nearest
+    return ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), t, 4)
 end
 
 ################################################################################
@@ -131,6 +57,12 @@ end
 #  String I/O
 #
 ################################################################################
+
+function show(io::IO, x::ArbField)
+  print(io, "Real Field with ")
+  print(io, prec(x))
+  print(io, " bits of precision and error bounds")
+end
 
 function show(io::IO, x::arb)
   d = ceil(parent(x).prec * 0.30102999566398119521)
@@ -224,47 +156,19 @@ function <=(x::arb, y::arb)
     return Bool(ccall((:arb_le, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
 end
 
-==(x::arb, y::Int) = x == arb(y)
-!=(x::arb, y::Int) = x != arb(y)
-<=(x::arb, y::Int) = x <= arb(y)
->=(x::arb, y::Int) = x >= arb(y)
-<(x::arb, y::Int) = x < arb(y)
->(x::arb, y::Int) = x > arb(y)
+==(x::arb, y::Union{Int,Float64,fmpz,fmpq}) = x == parent(x)(y)
+!=(x::arb, y::Union{Int,Float64,fmpz,fmpq}) = x != parent(x)(y)
+<=(x::arb, y::Union{Int,Float64,fmpz,fmpq}) = x <= parent(x)(y)
+>=(x::arb, y::Union{Int,Float64,fmpz,fmpq}) = x >= parent(x)(y)
+<(x::arb, y::Union{Int,Float64,fmpz,fmpq}) = x < parent(x)(y)
+>(x::arb, y::Union{Int,Float64,fmpz,fmpq}) = x > parent(x)(y)
 
-==(x::Int, y::arb) = arb(x) == y
-!=(x::Int, y::arb) = arb(x) != y
-<=(x::Int, y::arb) = arb(x) <= y
->=(x::Int, y::arb) = arb(x) >= y
-<(x::Int, y::arb) = arb(x) < y
->(x::Int, y::arb) = arb(x) > y
-
-==(x::arb, y::fmpz) = x == arb(y)
-!=(x::arb, y::fmpz) = x != arb(y)
-<=(x::arb, y::fmpz) = x <= arb(y)
->=(x::arb, y::fmpz) = x >= arb(y)
-<(x::arb, y::fmpz) = x < arb(y)
->(x::arb, y::fmpz) = x > arb(y)
-
-==(x::fmpz, y::arb) = arb(x) == y
-!=(x::fmpz, y::arb) = arb(x) != y
-<=(x::fmpz, y::arb) = arb(x) <= y
->=(x::fmpz, y::arb) = arb(x) >= y
-<(x::fmpz, y::arb) = arb(x) < y
->(x::fmpz, y::arb) = arb(x) > y
-
-==(x::arb, y::Float64) = x == arb(y)
-!=(x::arb, y::Float64) = x != arb(y)
-<=(x::arb, y::Float64) = x <= arb(y)
->=(x::arb, y::Float64) = x >= arb(y)
-<(x::arb, y::Float64) = x < arb(y)
->(x::arb, y::Float64) = x > arb(y)
-
-==(x::Float64, y::arb) = arb(x) == y
-!=(x::Float64, y::arb) = arb(x) != y
-<=(x::Float64, y::arb) = arb(x) <= y
->=(x::Float64, y::arb) = arb(x) >= y
-<(x::Float64, y::arb) = arb(x) < y
->(x::Float64, y::arb) = arb(x) > y
+==(x::Union{Int,Float64,fmpz,fmpq}, y::arb) = parent(y)(x) == y
+!=(x::Union{Int,Float64,fmpz,fmpq}, y::arb) = parent(y)(x) != y
+<=(x::Union{Int,Float64,fmpz,fmpq}, y::arb) = parent(y)(x) <= y
+>=(x::Union{Int,Float64,fmpz,fmpq}, y::arb) = parent(y)(x) >= y
+<(x::Union{Int,Float64,fmpz,fmpq}, y::arb) = parent(y)(x) < y
+>(x::Union{Int,Float64,fmpz,fmpq}, y::arb) = parent(y)(x) > y
 
 ################################################################################
 #

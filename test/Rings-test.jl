@@ -13,6 +13,9 @@ include("flint/fq_nmod_series-test.jl")
 include("flint/nmod_mat-test.jl")
 include("flint/fmpz_mat-test.jl")
 
+include("arb/arb_poly-test.jl")
+include("arb/acb_poly-test.jl")
+
 include("pari/pari_maximal_order_elem-test.jl")
 include("pari/PariIdeal-test.jl")
 
@@ -34,6 +37,9 @@ function test_rings()
    test_fmpz_mod_series()
    test_fq_series()
    test_fq_nmod_series()
+
+   test_arb_poly()
+   test_acb_poly()
 
    test_pari_maximal_order_elem()
    test_PariIdeal()
