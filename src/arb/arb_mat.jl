@@ -131,6 +131,17 @@ end
 #
 ################################################################################
 
+function ==(x::arb_mat, y::arb_mat)
+  check_parent(x, y)
+  r = ccall((:arb_mat_eq, :libarb), Cint, (Ptr{arb_mat}, Ptr{arb_mat}), &x, &y)
+  return Bool(r)
+end
+
+function !=(x::arb_mat, y::arb_mat)
+  r = ccall((:arb_mat_ne, :libarb), Cint, (Ptr{arb_mat}, Ptr{arb_mat}), &x, &y)
+  return Bool(r)
+end
+
 function strongequal(x::arb_mat, y::arb_mat)
   r = ccall((:arb_mat_equal, :libarb), Cint,
               (Ptr{arb_mat}, Ptr{arb_mat}), &x, &y)
@@ -485,10 +496,66 @@ function call(x::ArbMatSpace)
 end
 
 function call(x::ArbMatSpace, y::fmpz_mat)
+  (x.cols != cols(y) || x.rows != rows(y)) &&
+      error("Dimensions are wrong")
   z = arb_mat(y, prec(x))
   z.parent = x
   return z
 end
+
+function call(x::ArbMatSpace, y::Array{Int, 2})
+  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
+  z = arb_mat(x.rows, x.cols, y, prec(x))
+  z.parent = x
+  return z
+end
+
+call(x::ArbMatSpace, y::Array{Int, 1}) = x(y'')
+
+function call(x::ArbMatSpace, y::Array{UInt, 2})
+  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
+  z = arb_mat(x.rows, x.cols, y, prec(x))
+  z.parent = x
+  return z
+end
+
+call(x::ArbMatSpace, y::Array{UInt, 1}) = x(y'')
+
+function call(x::ArbMatSpace, y::Array{fmpz, 2})
+  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
+  z = arb_mat(x.rows, x.cols, y, prec(x))
+  z.parent = x
+  return z
+end
+
+call(x::ArbMatSpace, y::Array{fmpz, 1}) = x(y'')
+
+function call(x::ArbMatSpace, y::Array{Float64, 2})
+  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
+  z = arb_mat(x.rows, x.cols, y, prec(x))
+  z.parent = x
+  return z
+end
+
+call(x::ArbMatSpace, y::Array{Float64, 1}) = x(y'')
+
+function call(x::ArbMatSpace, y::Array{BigFloat, 2})
+  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
+  z = arb_mat(x.rows, x.cols, y, prec(x))
+  z.parent = x
+  return z
+end
+
+call(x::ArbMatSpace, y::Array{BigFloat, 1}) = x(y'')
+
+function call{T <: AbstractString}(x::ArbMatSpace, y::Array{T, 2})
+  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
+  z = arb_mat(x.rows, x.cols, y, prec(x))
+  z.parent = x
+  return z
+end
+
+call(x::ArbMatSpace, y::Array{AbstractString, 1}) = x(y'')
 
 ################################################################################
 #

@@ -25,6 +25,13 @@ function test_arb_mat_basic_ops()
 
    @test parent(zz) == M
 
+   @test M([2 0; 0 2]) == zz
+   @test M([UInt(2) UInt(0); UInt(0) UInt(2)]) == zz
+   @test M([fmpz(2) fmpz(0); fmpz(0) fmpz(2)]) == zz
+   @test M([2.0 0.0; 0.0 2.0]) == zz
+   @test M(["2" "0"; "0" "2"]) == zz
+   @test contains(M([BigFloat(2) BigFloat(0); BigFloat(0) BigFloat(2)]), zz)
+
    a = one(M)
 
    @test a[1, 1] == 1
@@ -49,42 +56,42 @@ function test_arb_mat_basic_ops()
    b[1, 1] = 1
    b[2, 2] = 1
 
-   @test strongequal(a, b)
+   @test a == b
 
    b = M()
 
    b[1, 1] = UInt(1)
    b[2, 2] = UInt(1)
 
-   @test strongequal(a, b)
+   @test a == b
 
    b = M()
 
    b[1, 1] = fmpz(1)
    b[2, 2] = fmpz(1)
 
-   @test strongequal(a, b)
+   @test a == b
 
    b = M()
 
    b[1, 1] = fmpq(1)
    b[2, 2] = fmpq(1)
 
-   @test strongequal(a, b)
+   @test a == b
 
    b = M()
 
    b[1, 1] = 1.0
    b[2, 2] = 1.0
 
-   @test strongequal(a, b)
+   @test a == b
 
    b = M()
 
    b[1, 1] = "1.0 +/- 0"
    b[2, 2] = "1.0 +/- 0"
 
-   @test strongequal(a, b)
+   @test a == b
 
    println("PASS")
 end
@@ -109,6 +116,10 @@ function test_arb_mat_comparison()
 
    approx2[1, 1] = "3 +/- 0.1"
    approx2[2, 2] = "3 +/- 0.1"
+
+   @test exact == exact
+   @test exact != exact2
+   @test exact != approx2
 
    @test strongequal(exact, deepcopy(exact))
    @test !strongequal(exact, approx)
@@ -211,25 +222,25 @@ function test_arb_mat_binary_ops()
    d[1, 1] = 4
    d[2, 2] = 4
 
-   @test strongequal(a + a, b)
-   @test strongequal(a + b, c)
-   @test strongequal(a * a, a)
-   @test strongequal(b * b, d)
-   @test strongequal(d - c, a)
+   @test a + a == b
+   @test a + b == c
+   @test a * a == a
+   @test b * b == d
+   @test d - c == a
 
-   @test strongequal(b^2, d)
-   @test strongequal(b^UInt(2), d)
+   @test b^2 == d
+   @test b^UInt(2) == d
 
-   @test strongequal(b * 2, d)
-   @test strongequal(b * fmpz(2), d)
-   @test strongequal(b * RR(2), d)
-   @test strongequal(2 * b, d)
-   @test strongequal(fmpz(2) * b, d)
-   @test strongequal(RR(2) * b, d)
+   @test b * 2 == d
+   @test b * fmpz(2) == d
+   @test b * RR(2) == d
+   @test 2 * b == d
+   @test fmpz(2) * b == d
+   @test RR(2) * b == d
 
-   @test strongequal(d//2, b)
-   @test strongequal(d//fmpz(2), b)
-   @test strongequal(d//RR(2), b)
+   @test d//2 == b
+   @test d//fmpz(2) == b
+   @test d//RR(2) == b
 
    println("PASS")
 end
@@ -365,15 +376,15 @@ function test_arb_mat_unsafe_ops()
 
    add!(z, a, b)
 
-   @test strongequal(z, c)
+   @test z == c
 
    mul!(z, b, b)
 
-   @test strongequal(z, d)
+   @test z == d
 
    sub!(z, d, c)
 
-   @test strongequal(z, a)
+   @test z == a
 
    println("PASS")
 end
