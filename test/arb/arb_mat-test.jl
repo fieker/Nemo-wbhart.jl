@@ -389,6 +389,18 @@ function test_arb_mat_unsafe_ops()
    println("PASS")
 end
 
+function test_arb_mat_charpoly()
+   print("arb_mat.charpoly()...")
+
+   z = M([1 0; 0 2])
+
+   Rx, x = PolynomialRing(RR, "x")
+
+   @test charpoly(z, Rx) == x^2 - 3x + 2
+
+   println("PASS")
+end
+
 function test_arb_mat()
    test_arb_mat_constructors()
    test_arb_mat_basic_ops()
@@ -401,6 +413,7 @@ function test_arb_mat()
    test_arb_mat_permutation()
    test_arb_mat_solving()
    test_arb_mat_determinant()
+   test_arb_mat_charpoly()
    test_arb_mat_special_functions()
    test_arb_mat_unsafe_ops()
 

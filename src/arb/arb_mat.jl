@@ -9,8 +9,8 @@
 export parent, elem_type, prec, base_ring, cols, rows, deepcopy, getindex!,
        setindex!, one, zero, show, strongequal, overlaps, contains, issquare,
        transpose, bound_inf_norm, -, +, *, //,  swap_rows!, lufact!, lufact,
-       solve, solve!, solve_lu_precomp, solve_lu_precomp!, inv, det, exp, add!,
-       mul!, sub!, call, MatrixSpace
+       solve, solve!, solve_lu_precomp, solve_lu_precomp!, inv, det, charpoly, 
+       exp, add!, mul!, sub!, call, MatrixSpace
 
 ###############################################################################
 #
@@ -444,13 +444,13 @@ end
 #
 ################################################################################
 
-#function characteristic_poly(x::arb_mat, y::ArbPolyRing)
-#  base_ring(x) != base_ring(y) && error("Base rings must coincide")
-#  z = y()
-#  ccall((:arb_mat_charpoly, :libarb), Void,
-#              (Ptr{arb_poly}, Ptr{arb_mat}, Int), &z, &x, prec(parent(x)))
-#  return z
-#end
+function charpoly(x::arb_mat, y::ArbPolyRing)
+  base_ring(x) != base_ring(y) && error("Base rings must coincide")
+  z = y()
+  ccall((:arb_mat_charpoly, :libarb), Void,
+              (Ptr{arb_poly}, Ptr{arb_mat}, Int), &z, &x, prec(parent(x)))
+  return z
+end
 
 ################################################################################
 #
