@@ -12,7 +12,7 @@ import Base: abs, asin, asinh, atan, atanh, base, bin, call, checkbounds,
              show, sign, sin, sinh, size, sqrt, string, sub, tan, tanh, trace,
              trailing_zeros, transpose, transpose!, truncate, var, zero,
              +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, hcat, vcat, //,
-             /, !=, isfinite, ldexp, lufact!, det
+             /, !=, isfinite, ldexp, lufact!, det, isreal
 
 import Base: floor, ceil, hypot, sqrt,
              log, log1p, exp, expm1, sin, cos, sinpi, cospi, tan, cot,

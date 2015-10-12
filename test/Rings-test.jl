@@ -15,6 +15,8 @@ include("flint/fmpz_mat-test.jl")
 
 include("arb/arb_poly-test.jl")
 include("arb/acb_poly-test.jl")
+include("arb/arb_mat-test.jl")
+include("arb/acb_mat-test.jl")
 
 include("pari/pari_maximal_order_elem-test.jl")
 include("pari/PariIdeal-test.jl")
@@ -50,5 +52,7 @@ function test_rings()
    test_matrix()
    test_nmod_mat()
    test_fmpz_mat()
+   test_arb_mat()
+   test_acb_mat()
 end
 

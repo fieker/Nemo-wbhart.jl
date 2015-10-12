@@ -12,6 +12,7 @@ export AcbField, acb
 export ArbPolyRing, arb_poly
 export AcbPolyRing, acb_poly
 export ArbMatSpace, arb_mat
+export AcbMatSpace, acb_mat
 
 arb_check_prec(p::Int) = (p >= 2 && p < (typemax(Int) >> 4)) || throw(ArgumentError("invalid precision"))
 
@@ -513,7 +514,8 @@ type arb_mat <: MatElem{arb}
     return z
   end
 
-  function arb_mat(r::Int, c::Int, arr::Array{Int, 2})
+  function arb_mat{T <: Union{Int, UInt, fmpz, Float64, BigFloat,
+                              arb}}(r::Int, c::Int, arr::Array{T, 2})
     z = new()
     ccall((:arb_mat_init, :libarb), Void, 
                 (Ptr{arb_mat}, Int, Int), &z, r, c)
@@ -522,116 +524,15 @@ type arb_mat <: MatElem{arb}
       for j = 1:c
         el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
                     (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
-        ccall((:arb_set_si, :libarb), Void,
-                    (Ptr{arb}, Int), el, arr[i, j])
-      end
-    end
-    return z
-  end
-      
-  function arb_mat(r::Int, c::Int, arr::Array{Int, 2}, prec::Int)
-    z = new()
-    ccall((:arb_mat_init, :libarb), Void, 
-                (Ptr{arb_mat}, Int, Int), &z, r, c)
-    finalizer(z, _arb_mat_clear_fn)
-    for i = 1:r
-      for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
-                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
-        ccall((:arb_set_si, :libarb), Void,
-                    (Ptr{arb}, Int), el, arr[i, j])
-        ccall((:arb_set_round, :libarb), Void,
-                    (Ptr{arb}, Ptr{arb}, Int), el, el, prec)
-       end
-     end
-     return z
-  end
-
-  function arb_mat(r::Int, c::Int, arr::Array{UInt, 2})
-    z = new()
-    ccall((:arb_mat_init, :libarb), Void, 
-                (Ptr{arb_mat}, Int, Int), &z, r, c)
-    finalizer(z, _arb_mat_clear_fn)
-    for i = 1:r
-      for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
-                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
-        ccall((:arb_set_ui, :libarb), Void,
-                    (Ptr{arb}, UInt), el, arr[i, j])
-      end
-    end
-    return z
-  end
-      
-  function arb_mat(r::Int, c::Int, arr::Array{UInt, 2}, prec::Int)
-    z = new()
-    ccall((:arb_mat_init, :libarb), Void, 
-                (Ptr{arb_mat}, Int, Int), &z, r, c)
-    finalizer(z, _arb_mat_clear_fn)
-    for i = 1:r
-      for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
-                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
-        ccall((:arb_set_si, :libarb), Void,
-                    (Ptr{arb}, UInt), el, arr[i, j])
-        ccall((:arb_set_round, :libarb), Void,
-                    (Ptr{arb}, Ptr{arb}, UInt), el, el, prec)
-       end
-     end
-     return z
-  end
-
-  function arb_mat(r::Int, c::Int, arr::Array{Float64, 2})
-    z = new()
-    ccall((:arb_mat_init, :libarb), Void, 
-                (Ptr{arb_mat}, Int, Int), &z, r, c)
-    finalizer(z, _arb_mat_clear_fn)
-    for i = 1:r
-      for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
-                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
-        ccall((:arb_set_d, :libarb), Void,
-                    (Ptr{arb}, Float64), el, arr[i, j])
-      end
-    end
-    return z
-  end
-      
-  function arb_mat(r::Int, c::Int, arr::Array{Float64, 2}, prec::Int)
-    z = new()
-    ccall((:arb_mat_init, :libarb), Void, 
-                (Ptr{arb_mat}, Int, Int), &z, r, c)
-    finalizer(z, _arb_mat_clear_fn)
-    for i = 1:r
-      for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
-                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
-        ccall((:arb_set_d, :libarb), Void,
-                    (Ptr{arb}, Float64), el, arr[i, j])
-        ccall((:arb_set_round, :libarb), Void,
-                    (Ptr{arb}, Ptr{arb}, Int), el, el, prec)
-       end
-     end
-     return z
-  end
-
-  function arb_mat(r::Int, c::Int, arr::Array{fmpz, 2})
-    z = new()
-    ccall((:arb_mat_init, :libarb), Void, 
-                (Ptr{arb_mat}, Int, Int), &z, r, c)
-    finalizer(z, _arb_mat_clear_fn)
-    for i = 1:r
-      for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
-                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
-        ccall((:arb_set_fmpz, :libarb), Void,
-                    (Ptr{arb}, Ptr{fmpz}), el, &arr[i, j])
+        _arb_set(el, arr[i, j])
       end
     end
     return z
   end
 
-  function arb_mat(r::Int, c::Int, arr::Array{fmpz, 2}, prec::Int)
+  function arb_mat{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb,
+                              AbstractString}}(r::Int, c::Int, arr::Array{T, 2},
+                                               prec::Int)
     z = new()
     ccall((:arb_mat_init, :libarb), Void, 
                 (Ptr{arb_mat}, Int, Int), &z, r, c)
@@ -640,67 +541,12 @@ type arb_mat <: MatElem{arb}
       for j = 1:c
         el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
                     (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
-        ccall((:arb_set_round_fmpz, :libarb), Void,
-                    (Ptr{arb}, Ptr{fmpz}, Cint), el, &arr[i, j], prec)
+        _arb_set(el, arr[i, j], prec)
       end
     end
     return z
   end
-
-  function arb_mat{T <: AbstractString}(r::Int, c::Int, arr::Array{T, 2}, prec::Int)
-    z = new()
-    ccall((:arb_mat_init, :libarb), Void, 
-                (Ptr{arb_mat}, Int, Int), &z, r, c)
-    finalizer(z, _arb_mat_clear_fn)
-    for i = 1:r
-      for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
-                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
-        s = bytestring(arr[i, j])
-        err = ccall((:arb_set_str, :libarb), Cint,
-                    (Ptr{arb}, Ptr{UInt8}, Int), el, s, prec)
-        err == 0 || error("Invalid real string: $(repr(s)) at $i,$j")
-      end
-    end
-    return z
-  end
-
-  function arb_mat(r::Int, c::Int, arr::Array{BigFloat, 2}, prec::Int)
-    z = new()
-    ccall((:arb_mat_init, :libarb), Void, 
-                (Ptr{arb_mat}, Int, Int), &z, r, c)
-    finalizer(z, _arb_mat_clear_fn)
-    for i = 1:r
-      for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
-                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
-        r = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), el)
-        ccall((:arf_set_mpfr, :libarb), Void,
-                    (Ptr{arf_struct}, Ptr{BigFloat}), r, &arr[i, j])
-        ccall((:arb_set_round, :libarb), Void,
-                    (Ptr{arb}, Ptr{arb}, Int), el, el, prec)
-      end
-    end
-    return z
-  end
-
-  function arb_mat(r::Int, c::Int, arr::Array{BigFloat, 2})
-    z = new()
-    ccall((:arb_mat_init, :libarb), Void, 
-                (Ptr{arb_mat}, Int, Int), &z, r, c)
-    finalizer(z, _arb_mat_clear_fn)
-    for i = 1:r
-      for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
-                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
-        r = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), el)
-        ccall((:arf_set_mpfr, :libarb), Void,
-                    (Ptr{arf_struct}, Ptr{BigFloat}), r, &arr[i, j])
-      end
-    end
-    return z
-  end
-
+     
 #  function arb_mat(a::fmpq_mat, prec::Int)
 #    z = new()
 #    ccall((:arb_mat_init, :libarb), Void,
@@ -714,5 +560,151 @@ end
 
 function _arb_mat_clear_fn(x::arb_mat)
   ccall((:arb_mat_clear, :libarb), Void, (Ptr{arb_mat}, ), &x)
+end
+
+################################################################################
+#
+#  Types and memory management for AcbMatSpace
+#
+################################################################################
+
+const AcbMatSpaceID = ObjectIdDict()
+
+type AcbMatSpace <: Ring{Arb}
+  rows::Int
+  cols::Int
+  base_ring::AcbField
+
+  function AcbMatSpace(R::AcbField, r::Int, c::Int)
+    if haskey(AcbMatSpaceID, (R, r, c))
+      return AcbMatSpaceID[(R, r, c)]::AcbMatSpace
+    else
+      z = new(r, c, R)
+      AcbMatSpaceID[(R, r, c)] = z
+      return z
+    end
+  end
+end
+
+type acb_mat <: MatElem{acb}
+  entries::Ptr{Void}
+  r::Int
+  c::Int
+  rows::Ptr{Void}
+  parent::AcbMatSpace
+
+  function acb_mat(r::Int, c::Int)
+    z = new()
+    ccall((:acb_mat_init, :libarb), Void, (Ptr{acb_mat}, Int, Int), &z, r, c)
+    finalizer(z, _acb_mat_clear_fn)
+    return z
+  end
+
+  function acb_mat(a::fmpz_mat)
+    z = new()
+    ccall((:acb_mat_init, :libarb), Void,
+                (Ptr{acb_mat}, Int, Int), &z, a.r, a.c)
+    ccall((:acb_mat_set_fmpz_mat, :libarb), Void,
+                (Ptr{acb_mat}, Ptr{fmpz_mat}), &z, &a)
+    finalizer(z, _acb_mat_clear_fn)
+    return z
+  end
+  
+  function acb_mat(a::fmpz_mat, prec::Int)
+    z = new()
+    ccall((:acb_mat_init, :libarb), Void,
+                (Ptr{acb_mat}, Int, Int), &z, a.r, a.c)
+    ccall((:acb_mat_set_round_fmpz_mat, :libarb), Void,
+                (Ptr{acb_mat}, Ptr{fmpz_mat}, Int), &z, &a, prec)
+    finalizer(z, _acb_mat_clear_fn)
+    return z
+  end
+
+  function acb_mat(a::arb_mat)
+    z = new()
+    ccall((:acb_mat_init, :libarb), Void,
+                (Ptr{acb_mat}, Int, Int), &z, a.r, a.c)
+    ccall((:acb_mat_set_arb_mat, :libarb), Void,
+                (Ptr{acb_mat}, Ptr{arb_mat}), &z, &a)
+    finalizer(z, _acb_mat_clear_fn)
+    return z
+  end
+
+  function acb_mat(a::arb_mat, prec::Int)
+    z = new()
+    ccall((:acb_mat_init, :libarb), Void,
+                (Ptr{acb_mat}, Int, Int), &z, a.r, a.c)
+    ccall((:acb_mat_set_round_arb_mat, :libarb), Void,
+                (Ptr{acb_mat}, Ptr{arb_mat}, Int), &z, &a, prec)
+    finalizer(z, _acb_mat_clear_fn)
+    return z
+  end
+   
+  function acb_mat{T <: Union{Int, UInt, Float64, fmpz, BigFloat, acb,
+                              arb}}(r::Int, c::Int, arr::Array{T, 2})
+    z = new()
+    ccall((:acb_mat_init, :libarb), Void, 
+                (Ptr{acb_mat}, Int, Int), &z, r, c)
+    finalizer(z, _acb_mat_clear_fn)
+    for i = 1:r
+      for j = 1:c
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
+                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+        _acb_set(el, arr[i, j])
+      end
+    end
+    return z
+  end
+
+  function acb_mat{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb,
+                              AbstractString, acb}}(r::Int, c::Int,
+                                                    arr::Array{T, 2}, prec::Int)
+    z = new()
+    ccall((:acb_mat_init, :libarb), Void, 
+                (Ptr{acb_mat}, Int, Int), &z, r, c)
+    finalizer(z, _acb_mat_clear_fn)
+    for i = 1:r
+      for j = 1:c
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
+                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+        _acb_set(el, arr[i, j], prec)
+      end
+    end
+    return z
+  end
+
+  function acb_mat{T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb,
+                              AbstractString}}(r::Int, c::Int,
+                                               arr::Array{Tuple{T, T}, 2},
+                                               prec::Int)
+
+    z = new()
+    ccall((:acb_mat_init, :libarb), Void, 
+                (Ptr{acb_mat}, Int, Int), &z, r, c)
+    finalizer(z, _acb_mat_clear_fn)
+    for i = 1:r
+      for j = 1:c
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
+                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+        _acb_set(el, arr[i, j][1], arr[i,j][2], prec)
+      end
+    end
+    return z
+  end
+
+    
+#  function arb_mat(a::fmpq_mat, prec::Int)
+#    z = new()
+#    ccall((:arb_mat_init, :libarb), Void,
+#                (Ptr{arb_mat}, Int, Int), &z, a.r, a.c)
+#    ccall((:arb_mat_set_fmpq_mat, :libarb), Void,
+#                (Ptr{arb_mat}, Ptr{fmpq_mat}, Int), &z, &a, prec)
+#    finalizer(z, _arb_mat_clear_fn)
+#    return z
+#  end
+end
+
+function _acb_mat_clear_fn(x::acb_mat)
+  ccall((:acb_mat_clear, :libarb), Void, (Ptr{acb_mat}, ), &x)
 end
 
