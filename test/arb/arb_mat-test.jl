@@ -2,10 +2,11 @@ if !on_windows64
 
 RR = ArbField(64)
 
-M = MatrixSpace(RR, 2, 2)
 
 function test_arb_mat_constructors()
    print("arb_mat.constructors()...")
+
+   M = MatrixSpace(RR, 2, 2)
 
    @test isa(M, ArbMatSpace)
    @test isa(M(), MatElem)
@@ -19,7 +20,9 @@ function test_arb_mat_constructors()
 end
 
 function test_arb_mat_basic_ops()
-   print("arb.basic_ops()...")
+   print("arb_mat.basic_ops()...")
+
+   M = MatrixSpace(RR, 2, 2)
 
    zz = M(MatrixSpace(ZZ, 2, 2)(2))
 
@@ -28,9 +31,10 @@ function test_arb_mat_basic_ops()
    @test M([2 0; 0 2]) == zz
    @test M([UInt(2) UInt(0); UInt(0) UInt(2)]) == zz
    @test M([fmpz(2) fmpz(0); fmpz(0) fmpz(2)]) == zz
+   @test M([QQ(2) QQ(0); QQ(0) QQ(2)]) == zz
    @test M([2.0 0.0; 0.0 2.0]) == zz
    @test M(["2" "0"; "0" "2"]) == zz
-   @test contains(M([BigFloat(2) BigFloat(0); BigFloat(0) BigFloat(2)]), zz)
+   @test M([BigFloat(2) BigFloat(0); BigFloat(0) BigFloat(2)]) == zz
 
    a = one(M)
 
@@ -99,6 +103,8 @@ end
 function test_arb_mat_comparison()
    print("arb_mat.comparison()...")
 
+   M = MatrixSpace(RR, 2, 2)
+
    exact = M()
    exact[1, 1] = 2
    exact[2, 2] = 2
@@ -142,6 +148,8 @@ end
 function test_arb_mat_predicates()
    print("arb_mat.predicates()...")
 
+   M = MatrixSpace(RR, 2, 2)
+
    a = M()
 
    @test issquare(a)
@@ -155,6 +163,8 @@ end
 
 function test_arb_mat_transpose()
    print("arb_mat.transpose()...")
+
+   M = MatrixSpace(RR, 2, 2)
 
    a = M()
 
@@ -174,6 +184,8 @@ end
 function test_arb_mat_norm_bound()
    print("arb_mat.norm_bound()...")
  
+   M = MatrixSpace(RR, 2, 2)
+
    a = M()
    a[1, 1] = 2
    a[1, 2] = 3
@@ -191,6 +203,8 @@ end
 function test_arb_mat_unary_ops()
    print("arb_mat.unary_ops()...")
 
+   M = MatrixSpace(RR, 2, 2)
+
    a = one(M)
 
    b = -a
@@ -205,6 +219,8 @@ end
 
 function test_arb_mat_binary_ops()
    print("arb_mat.binary_ops()...")
+
+   M = MatrixSpace(RR, 2, 2)
 
    a = one(M)
    b = M()
@@ -248,6 +264,8 @@ end
 function test_arb_mat_permutation()
    print("arb_mat.permuation()...")
 
+   M = MatrixSpace(RR, 2, 2)
+
    z = one(M)
    p = PermutationGroup(2)([2, 1])
 
@@ -263,6 +281,8 @@ end
 
 function test_arb_mat_solving()
    print("arb_mat.solving()...")
+
+   M = MatrixSpace(RR, 2, 2)
 
    z = one(M)
 
@@ -319,6 +339,8 @@ end
 function test_arb_mat_determinant()
    print("arb_mat.determinant()...")
 
+   M = MatrixSpace(RR, 2, 2)
+
    z = M()
 
    z[1, 1] = "3 +/- 0.1"
@@ -337,6 +359,8 @@ end
 
 function test_arb_mat_special_functions()
    print("arb_mat.special_functions()...")
+
+   M = MatrixSpace(RR, 2, 2)
 
    z = M()
 
@@ -357,6 +381,8 @@ end
 
 function test_arb_mat_unsafe_ops()
    print("arb_mat.unsafe_ops()...")
+
+   M = MatrixSpace(RR, 2, 2)
 
    a = one(M)
    b = M()
@@ -391,6 +417,8 @@ end
 
 function test_arb_mat_charpoly()
    print("arb_mat.charpoly()...")
+
+   M = MatrixSpace(RR, 2, 2)
 
    z = M([1 0; 0 2])
 

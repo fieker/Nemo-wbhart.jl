@@ -56,32 +56,16 @@ function getindex(x::arb_mat, r::Int, c::Int)
   return z
 end
 
-function setindex!(x::arb_mat, y::arb, r::Int, c::Int)
+function setindex!(x::arb_mat, y::Union{Int, UInt, fmpz, fmpq, Float64,
+                                        BigFloat, arb, AbstractString},
+                                        r::Int, c::Int)
   _checkbounds(rows(x), r) || throw(BoundsError())
   _checkbounds(cols(x), c) || throw(BoundsError())
 
   z = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
               (Ptr{arb_mat}, Int, Int), &x, r - 1, c - 1)
-  ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb}), z, &y)
+  _arb_set(z, y, prec(base_ring(x)))
 end
-
-setindex!(x::arb_mat, y::Int, r::Int, c::Int) =
-            setindex!(x, base_ring(x)(y), r, c)
-
-setindex!(x::arb_mat, y::UInt, r::Int, c::Int) =
-            setindex!(x, base_ring(x)(y), r, c)
-
-setindex!(x::arb_mat, y::fmpz, r::Int, c::Int) =
-            setindex!(x, base_ring(x)(y), r, c)
-
-setindex!(x::arb_mat, y::fmpq, r::Int, c::Int) =
-            setindex!(x, base_ring(x)(y), r, c)
-
-setindex!(x::arb_mat, y::Float64, r::Int, c::Int) =
-            setindex!(x, base_ring(x)(y), r, c)
-
-setindex!(x::arb_mat, y::AbstractString, r::Int, c::Int) =
-            setindex!(x, base_ring(x)(y), r, c)
 
 function one(x::ArbMatSpace)
   z = x()
@@ -503,59 +487,16 @@ function call(x::ArbMatSpace, y::fmpz_mat)
   return z
 end
 
-function call(x::ArbMatSpace, y::Array{Int, 2})
+function call{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb,
+                         AbstractString}}(x::ArbMatSpace, y::Array{T, 2})
   (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
   z = arb_mat(x.rows, x.cols, y, prec(x))
   z.parent = x
   return z
 end
 
-call(x::ArbMatSpace, y::Array{Int, 1}) = x(y'')
-
-function call(x::ArbMatSpace, y::Array{UInt, 2})
-  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
-  z = arb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
-  return z
-end
-
-call(x::ArbMatSpace, y::Array{UInt, 1}) = x(y'')
-
-function call(x::ArbMatSpace, y::Array{fmpz, 2})
-  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
-  z = arb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
-  return z
-end
-
-call(x::ArbMatSpace, y::Array{fmpz, 1}) = x(y'')
-
-function call(x::ArbMatSpace, y::Array{Float64, 2})
-  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
-  z = arb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
-  return z
-end
-
-call(x::ArbMatSpace, y::Array{Float64, 1}) = x(y'')
-
-function call(x::ArbMatSpace, y::Array{BigFloat, 2})
-  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
-  z = arb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
-  return z
-end
-
-call(x::ArbMatSpace, y::Array{BigFloat, 1}) = x(y'')
-
-function call{T <: AbstractString}(x::ArbMatSpace, y::Array{T, 2})
-  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
-  z = arb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
-  return z
-end
-
-call(x::ArbMatSpace, y::Array{AbstractString, 1}) = x(y'')
+call{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb,
+                AbstractString}}(x::ArbMatSpace, y::Array{T, 1}) = x(y'')
 
 ################################################################################
 #
