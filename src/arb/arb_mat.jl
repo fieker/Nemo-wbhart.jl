@@ -389,17 +389,16 @@ function solve(x::arb_mat, y::arb_mat)
 end
 
 function solve_lu_precomp!(z::arb_mat, P::perm, LU::arb_mat, y::arb_mat)
-  inv!(P)
+  Q = inv(P)
   ccall((:arb_mat_solve_lu_precomp, :libarb), Void,
               (Ptr{arb_mat}, Ptr{Int}, Ptr{arb_mat}, Ptr{arb_mat}, Int),
-              &z, P.d, &LU, &y, prec(parent(LU)))
+              &z, Q.d, &LU, &y, prec(parent(LU)))
   nothing
 end
 
 function solve_lu_precomp(P::perm, LU::arb_mat, y::arb_mat)
   cols(LU) != rows(y) && error("Matrix dimensions are wrong")
   z = parent(y)()
-  inv!(P)
   solve_lu_precomp!(z, P, LU, y)
   return z
 end
