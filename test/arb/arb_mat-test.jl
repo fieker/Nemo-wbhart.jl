@@ -300,17 +300,20 @@ function test_arb_mat_solving()
    z[2, 1] = 14
    z[2, 2] = 654
 
-   p = PermutationGroup(2)()
+   P = PermutationGroup(2)
 
-   l, u = lufact(p, z)
+   d, p, l, u = lufact(z, P)
 
-   @test overlaps(p*l*u, z)
+   @test d == 2
+   @test overlaps(l*u, p*z)
 
-   lufact!(p, z)
+   d = lufact!(p, z)
 
+   @test d == 2
    @test overlaps(l + u - one(M), z)
 
    z = 2*one(M)
+   swap_rows!(z, 1, 2)
    w = MatrixSpace(RR, 2, 1)()
    w[1, 1] = 4
    w[2, 1] = 4
@@ -424,7 +427,7 @@ function test_arb_mat_charpoly()
 
    Rx, x = PolynomialRing(RR, "x")
 
-   @test charpoly(z, Rx) == x^2 - 3x + 2
+   @test charpoly(Rx, z) == x^2 - 3x + 2
 
    println("PASS")
 end

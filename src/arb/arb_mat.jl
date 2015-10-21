@@ -340,21 +340,23 @@ function swap_rows!(x::arb_mat, i::Int, j::Int)
 end
 
 function lufact!(P::perm, x::arb_mat)
+  cols(x) != rows(x) && error("Matrix must be square")
+  parent(P).n != rows(x) && error("Permutation does not match matrix")
   r = ccall((:arb_mat_lu, :libarb), Cint,
               (Ptr{Int}, Ptr{arb_mat}, Ptr{arb_mat}, Int),
               P.d, &x, &x, prec(parent(x)))
   r == 0 && error("Could not find $(rows(x)) invertible pivot elements")
-  return r
+  inv!(P)
+  return rows(x)
 end
 
-function lufact(P::perm, x::arb_mat)
-  cols(x) != rows(x) && error("Matrix must be square")
-  parent(P).n != rows(x) && error("Permutation does not match matrix")
+function lufact(x::arb_mat, P = FlintPermGroup(rows(x)))
+  p = P()
   R = base_ring(x)
   L = parent(x)()
   U = deepcopy(x)
   n = cols(x)
-  lufact!(P, U)
+  r = lufact!(p, U)
   for i = 1:n
     for j = 1:n
       if i > j
@@ -367,7 +369,7 @@ function lufact(P::perm, x::arb_mat)
       end
     end
   end
-  return L, U
+  return r, p, L, U
 end
 
 function solve!(z::arb_mat, x::arb_mat, y::arb_mat)
@@ -387,6 +389,7 @@ function solve(x::arb_mat, y::arb_mat)
 end
 
 function solve_lu_precomp!(z::arb_mat, P::perm, LU::arb_mat, y::arb_mat)
+  inv!(P)
   ccall((:arb_mat_solve_lu_precomp, :libarb), Void,
               (Ptr{arb_mat}, Ptr{Int}, Ptr{arb_mat}, Ptr{arb_mat}, Int),
               &z, P.d, &LU, &y, prec(parent(LU)))
@@ -396,6 +399,7 @@ end
 function solve_lu_precomp(P::perm, LU::arb_mat, y::arb_mat)
   cols(LU) != rows(y) && error("Matrix dimensions are wrong")
   z = parent(y)()
+  inv!(P)
   solve_lu_precomp!(z, P, LU, y)
   return z
 end
@@ -428,11 +432,11 @@ end
 #
 ################################################################################
 
-function charpoly(x::arb_mat, y::ArbPolyRing)
-  base_ring(x) != base_ring(y) && error("Base rings must coincide")
-  z = y()
+function charpoly(x::ArbPolyRing, y::arb_mat)
+  base_ring(y) != base_ring(x) && error("Base rings must coincide")
+  z = x()
   ccall((:arb_mat_charpoly, :libarb), Void,
-              (Ptr{arb_poly}, Ptr{arb_mat}, Int), &z, &x, prec(parent(x)))
+              (Ptr{arb_poly}, Ptr{arb_mat}, Int), &z, &y, prec(parent(y)))
   return z
 end
 
