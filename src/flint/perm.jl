@@ -100,6 +100,18 @@ function inv(a::perm)
    return p
 end
 
+################################################################################
+#
+#  Unsafe operations
+#
+################################################################################
+
+function inv!(a::perm)
+   ccall((:_perm_inv, :libflint), Void, 
+         (Ref{Int}, Ref{Int}, Int), a.d, a.d, parent(a).n)
+   nothing
+end
+
 ###############################################################################
 #
 #   Parent object call overloads
