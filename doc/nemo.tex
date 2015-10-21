@@ -3348,7 +3348,7 @@ triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
 matrix whose rows are the given permutation $p$ of the rows of $A$.}
 
 \begin{lstlisting}
-lufact{T <: FieldElem}(A::Mat{T}, P = FlintPermGroup(rows(a)))
+fflu{T <: FieldElem}(A::Mat{T}, P = FlintPermGroup(rows(a)))
 \end{lstlisting}
 
 \desc{Return a tuple $r, d, p, L, U$ consisting of the rank of $A$, a
