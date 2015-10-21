@@ -8,7 +8,7 @@
 
 export parent, elem_type, prec, base_ring, cols, rows, deepcopy, getindex!,
        setindex!, one, zero, show, strongequal, overlaps, contains, issquare,
-       transpose, bound_inf_norm, -, +, *, //,  swap_rows!, lufact!, lufact,
+       transpose, bound_inf_norm, -, +, *, //,  ldexp, swap_rows!, lufact!, lufact,
        solve, solve!, solve_lu_precomp, solve_lu_precomp!, inv, det, charpoly, 
        exp, add!, mul!, sub!, call, MatrixSpace
 
@@ -398,7 +398,8 @@ function lufact!(P::perm, x::acb_mat)
               (Ptr{Int}, Ptr{acb_mat}, Ptr{acb_mat}, Int),
               P.d, &x, &x, prec(parent(x)))
   r == 0 && error("Could not find $(rows(x)) invertible pivot elements")
-  return r
+  inv!(P)
+  return rows(x)
 end
 
 function lufact(P::perm, x::acb_mat)
@@ -441,9 +442,10 @@ function solve(x::acb_mat, y::acb_mat)
 end
 
 function solve_lu_precomp!(z::acb_mat, P::perm, LU::acb_mat, y::acb_mat)
+  Q = inv(P)
   ccall((:acb_mat_solve_lu_precomp, :libarb), Void,
               (Ptr{acb_mat}, Ptr{Int}, Ptr{acb_mat}, Ptr{acb_mat}, Int),
-              &z, P.d, &LU, &y, prec(parent(LU)))
+              &z, Q.d, &LU, &y, prec(parent(LU)))
   nothing
 end
 
@@ -482,11 +484,11 @@ end
 #
 ################################################################################
 
-function charpoly(x::acb_mat, y::AcbPolyRing)
+function charpoly(x::AcbPolyRing, y::acb_mat)
   base_ring(x) != base_ring(y) && error("Base rings must coincide")
-  z = y()
+  z = x()
   ccall((:acb_mat_charpoly, :libarb), Void,
-              (Ptr{acb_poly}, Ptr{acb_mat}, Int), &z, &x, prec(parent(x)))
+              (Ptr{acb_poly}, Ptr{acb_mat}, Int), &z, &y, prec(parent(y)))
   return z
 end
 
@@ -581,5 +583,6 @@ call{T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, AbstractString,
 ################################################################################
 
 function MatrixSpace(R::AcbField, r::Int, c::Int)
+  (r <= 0 || c <= 0) && error("Dimensions must be positive")
   return AcbMatSpace(R, r, c)
 end

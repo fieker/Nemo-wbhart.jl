@@ -1,13 +1,10 @@
 if !on_windows64
 
-CC = AcbField(64)
-
-RR = ArbField(64)
-
-
 function test_acb_mat_constructors()
    print("acb_mat.constructors()...")
 
+   CC = AcbField(64)
+   RR = ArbField(64)
    M = MatrixSpace(CC, 2, 2)
 
    @test isa(M, AcbMatSpace)
@@ -24,6 +21,9 @@ end
 function test_acb_mat_basic_ops()
    print("acb_mat.basic_ops()...")
 
+   CC = AcbField(64)
+   RR = ArbField(64)
+
    M = MatrixSpace(CC, 2, 2)
    zz = M(MatrixSpace(ZZ, 2, 2)(2))
 
@@ -35,6 +35,8 @@ function test_acb_mat_basic_ops()
    @test M([UInt(2) UInt(0); UInt(0) UInt(2)]) == zz
    @test M([fmpz(2) fmpz(0); fmpz(0) fmpz(2)]) == zz
    @test M([QQ(2) QQ(0); QQ(0) QQ(2)]) == zz
+   @test M([RR(2) RR(0); RR(0) RR(2)]) == zz
+   @test M([CC(2) CC(0); CC(0) CC(2)]) == zz
    @test M([2.0 0.0; 0.0 2.0]) == zz
    @test M(["2" "0"; "0" "2"]) == zz
    @test M([BigFloat(2) BigFloat(0); BigFloat(0) BigFloat(2)]) == zz
@@ -164,6 +166,9 @@ end
 function test_acb_mat_comparison()
    print("acb_mat.comparison()...")
 
+   CC = AcbField(64)
+   RR = ArbField(64)
+
    M = MatrixSpace(CC, 2, 2)
 
    exact = M()
@@ -209,6 +214,9 @@ end
 function test_acb_mat_predicates()
    print("acb_mat.predicates()...")
 
+   CC = AcbField(64)
+   RR = ArbField(64)
+
    M = MatrixSpace(CC, 2, 2)
 
    a = M()
@@ -227,6 +235,9 @@ end
 
 function test_acb_mat_transpose()
    print("acb_mat.transpose()...")
+
+   CC = AcbField(64)
+   RR = ArbField(64)
 
    M = MatrixSpace(CC, 2, 2)
 
@@ -247,7 +258,10 @@ end
 
 function test_acb_mat_norm_bound()
    print("acb_mat.norm_bound()...")
- 
+
+   CC = AcbField(64)
+   RR = ArbField(64)
+
    M = MatrixSpace(CC, 2, 2)
 
    a = M()
@@ -267,6 +281,9 @@ end
 function test_acb_mat_unary_ops()
    print("acb_mat.unary_ops()...")
 
+   CC = AcbField(64)
+   RR = ArbField(64)
+
    M = MatrixSpace(CC, 2, 2)
 
    a = one(M)
@@ -283,6 +300,9 @@ end
 
 function test_acb_mat_binary_ops()
    print("acb_mat.binary_ops()...")
+
+   CC = AcbField(64)
+   RR = ArbField(64)
 
    M = MatrixSpace(CC, 2, 2)
 
@@ -333,6 +353,9 @@ end
 function test_acb_mat_misc_ops()
    print("acb_mat.misc_ops()...")
 
+   CC = AcbField(64)
+   RR = ArbField(64)
+
    M = MatrixSpace(CC, 2, 2)
 
    z = M([3 3; 3 3])
@@ -343,6 +366,9 @@ function test_acb_mat_misc_ops()
 end
 function test_acb_mat_permutation()
    print("acb_mat.permuation()...")
+
+   CC = AcbField(64)
+   RR = ArbField(64)
 
    M = MatrixSpace(CC, 2, 2)
 
@@ -361,6 +387,9 @@ end
 
 function test_acb_mat_solving()
    print("acb_mat.solving()...")
+
+   CC = AcbField(64)
+   RR = ArbField(64)
 
    M = MatrixSpace(CC, 2, 2)
 
@@ -419,6 +448,9 @@ end
 function test_acb_mat_determinant()
    print("acb_mat.determinant()...")
 
+   CC = AcbField(64)
+   RR = ArbField(64)
+
    M = MatrixSpace(CC, 2, 2)
 
    z = M()
@@ -439,6 +471,9 @@ end
 
 function test_acb_mat_special_functions()
    print("acb_mat.special_functions()...")
+
+   CC = AcbField(64)
+   RR = ArbField(64)
 
    M = MatrixSpace(CC, 2, 2)
 
@@ -461,6 +496,9 @@ end
 
 function test_acb_mat_unsafe_ops()
    print("acb_mat.unsafe_ops()...")
+
+   CC = AcbField(64)
+   RR = ArbField(64)
 
    M = MatrixSpace(CC, 2, 2)
 
@@ -498,13 +536,16 @@ end
 function test_acb_mat_charpoly()
    print("acb_mat.charpoly()...")
 
+   CC = AcbField(64)
+   RR = ArbField(64)
+
    M = MatrixSpace(CC, 2, 2)
 
    z = M([1 0; 0 2])
 
    Rx, x = PolynomialRing(CC, "x")
 
-   @test charpoly(z, Rx) == x^2 - 3x + 2
+   @test charpoly(Rx, z) == x^2 - 3x + 2
 
    println("PASS")
 end
