@@ -11368,6 +11368,211 @@ hyp1f1(s, s+1, z)
 
 \end{lstlisting}
 
+\subsection{Arb matrices over $\R$: \code|arb_mat|}
+
+The Arb type for matrices over $\R$ is \code{arb_mat}.
+As entries of these matrices are of type \code{arb}, elements of type \code{arb_mat}
+are sets of matrices.
+
+The parent object for Arb real matrices is of type \code{ArbMatSpace}, which
+belongs to the \code{Ring} type class.
+
+The \code{ArbMatSpace} parent is initialised by invoking \code{MatrixSpace}
+with the base ring of type \code{ArbField}.
+
+The following creates a parent object \code{M} representing
+the ring of matrices over the real numbers with 64-bit precision, with two rows
+and two columns.
+
+\begin{lstlisting}
+RR = ArbField(64)
+M = MatrixSpace(RR, 2, 2)
+\end{lstlisting}
+
+In the following, we will assume that \code{M} is an \code{ArbMatSpace}
+instance as above and we let $r$ stand for the number of rows and $c$ for the
+number of columns, e.g. $r = 3$ and $c = 3$ in the case of $M$ as we just defined it.
+
+We describe functions for \code{arb_mat} only where they differ from the functions
+available for generic matrices.
+
+\subsubsection{Constructors}
+
+\begin{lstlisting}
+M(x::fmpz_mat)
+M(x::Array{arb, 2})
+M(x::Array{Int, 2})
+M(x::Array{fmpz, 2})
+M(x::Array{Float64, 2})
+M(x::Array{BigFloat, 2})
+M(x::Array{AbstractString, 2})
+\end{lstlisting}
+
+\desc{Constructs an \code{arb_mat} element with $r$ rows and $c$ columns element
+from the given value. Elements are coerced in the base ring.
+Valid strings include integer and floating-point literals. Midpoint-radius
+pairs of such literals may also be given in the form \code{"m +/- r"}
+or \code{"[m +/- r]"}}
+
+\textbf{Example}
+
+Here are some examples of constructors:
+
+\begin{lstlisting}
+z = MatrixSpace(ZZ, 2, 2)([1 2; 3 4])
+M(z)
+M([1.0 1.2; 1.3 1.4])
+M(["1.1 +/- 0.2" "1"; "2" "3"])
+\end{lstlisting}
+
+\subsubsection{Comparison}
+
+\begin{lstlisting}
+==(A::arb_mat, B::arb_mat)
+\end{lstlisting}
+
+\desc{Return wether $A$ and $B$ certainly represent the same matrix.}
+
+\begin{lstlisting}
+!=(A::arb_mat, B::arb_mat)
+\end{lstlisting}
+
+\desc{Return wether $A$ and $B$ certainly do not represent the same matrix.}
+
+\begin{lstlisting}
+strongequal(A::arb_mat, B::arb_mat)
+\end{lstlisting}
+
+\desc{Return wether $A$ and $B$ are equal as sets.}
+
+\begin{lstlisting}
+overlaps(A::arb_mat, B::arb_mat)
+\end{lstlisting}
+
+\desc{Return wether $A$ and $B$ have an element in common.}
+
+\begin{lstlisting}
+contains(A::arb_mat, B::arb_mat)
+contains(A::arb_mat, B::fmpz_mat)
+\end{lstlisting}
+
+\textbf{Example}
+
+Here are some examples of comparisons:
+
+\begin{lstlisting}
+a = M(["1.0 +/ 0.1" "1"; "1" "1"])
+b = M([1 1; 1 1])
+c = M([1.0 1.0; 1.0 1.0])
+
+a == b
+b != c
+strongequal(b, c)
+overlaps(a, b)
+contains(a, b)
+\end{lstlisting}
+
+\desc{Return wether $A$ contains $B$.}
+
+\subsubsection{LU factorisation and solving for non-singular matrics}
+
+While the LU factorisation of \code{arb_mat} shares the same syntax
+as the corresponding functions for generic matrices, the input matrix
+is required to be square and of full rank. For the sake of completeness
+we reproduce the documentation here.
+
+\begin{lstlisting}
+lufact(A::arb_mat, P = FlintPermGroup(rows(A)))
+\end{lstlisting}
+
+\desc{Return a tuple $r, p, L, U$ consisting of the rank of $A$, a permutation
+$p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper
+triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
+matrix whose rows are the given permutation $p$ of the rows of $A$.
+
+The input matrix $A$ must be square $n\times n$ matrix. If no $n$ invertible
+pivot elements can be found, an error is thrown.}
+
+\begin{lstlisting}
+solve(A::arb_mat, B::arb_mat)
+\end{lstlisting}
+
+\desc{Given a $n \times n$ matrix $A$ and $n \times m$ matrix $B$, return $A^{-1}B$.
+
+If $A$ cannot be inverted numerically, an error is thrown.}
+
+\textbf{Examples}
+
+Here are some examples:
+
+\begin{lstlisting}
+A = M([2 0; 0 2])
+p, L, U = lufact(A)
+
+B = M([4 0; 0 4])
+X = solve(A, B)
+\end{lstlisting}
+
+For solving various systems with the same left hand side, the following functions
+are useful.
+
+\begin{lstlisting}
+lufact!(p::perm, A::arb_mat)
+\end{lstlisting}
+
+\desc{The permutation $p$ will be overwritten.
+The matrix $A$ will be overwritten with a unit diagonal lower triangular matrix $L$
+and an upper triangular matrix $U$ such that $LU = pA$.
+
+The input matrix $A$ must be square $n\times n$ matrix. If no $n$ invertible
+pivot elements can be found, an error is thrown.}
+
+\begin{lstlisting}
+solve_lu_precomp(p::perm, LU::arb_mat, B::arb_mat)
+\end{lstlisting}
+
+\desc{Solves $AX = B$ given the precomputed non-singular LU factorisation $A = p(LU)$ of $A$.}
+
+\textbf{Examples}
+
+Here are some examples:
+
+\begin{lstlisting}
+A = M([2 0; 0 2])
+LU = deepcopy(A)
+p = FlintPermutationGroup(2)()
+lufact!(p, LU)
+
+B = M([4 0; 0 4])
+X = solve_lu_precomp(p, LU, B)
+\end{lstlisting}
+
+\subsubsection{Norms}
+
+\begin{lstlisting}
+bound_inf_norm(A::arb_mat)
+\end{lstlisting}
+
+\desc{Returns a bound on the infinity norm of $A$
+(the largest absolute value row sum), as
+an element of the base ring of $A$.}
+
+\subsection{Characteristic polynomial}
+
+\begin{lstlisting}
+charpoly(R::ArbPolyRing, A::arb_mat)
+\end{lstlisting}
+
+\desc{Returns the characteristic polynomial of $A$ as an element of $R$.}
+
+\subsection{Exponential}
+
+\begin{lstlisting}
+exp(A::arb_mat)
+\end{lstlisting}
+
+\desc{Returns $exp(A)$.}
+
 \section{Pari rings}
 
 Pari is a library for algebraic number theory, maintained in Bordeaux, France.
