@@ -277,7 +277,11 @@ function test_fmpz_poly_evaluation()
 
    @test evaluate(f, 3) == 16
    
+   @test f(3) == 16
+
    @test evaluate(f, fmpz(10)) == 121
+
+   @test f(fmpz(10)) == 121
 
    println("PASS")
 end
@@ -357,6 +361,23 @@ function test_fmpz_poly_signature()
    println("PASS")
 end
 
+function test_fmpz_poly_interpolate()
+  print("fmpz_poly.interpolate...")
+  
+  Rx, x = PolynomialRing(ZZ, "x")
+
+  xval = [ ZZ(0), ZZ(1), ZZ(2), ZZ(3) ]
+
+  yval = [ ZZ(0), ZZ(1), ZZ(4), ZZ(9) ] 
+
+  f = interpolate(Rx, xval, yval)
+
+  @test parent(f) == Rx
+  @test f == x^2
+
+  println("PASS")
+end
+
 function test_fmpz_poly_special()
    print("fmpz_poly.special...")
 
@@ -417,6 +438,7 @@ function test_fmpz_poly()
    test_fmpz_poly_discriminant()
    test_fmpz_poly_gcdx()
    test_fmpz_poly_signature()
+   test_fmpz_poly_interpolate()
    test_fmpz_poly_special()
    test_fmpz_poly_Polynomials()
 

@@ -109,6 +109,10 @@ function test_nmod_poly_manipulation()
 
   @test var(Rx) == :x
 
+  @test modulus(x) == 17
+
+  @test modulus(R) == 17
+
   println("PASS")
 end
 
@@ -456,6 +460,12 @@ function test_nmod_poly_evaluate()
   @test s == R(14)
 
   @test t == R(14)
+
+  @test f(R(20)) == R(14)
+
+  @test f(20) == R(14)
+
+  @test f(fmpz(20)) == R(14)
 
   println("PASS")
 end
