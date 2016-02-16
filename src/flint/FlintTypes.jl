@@ -133,7 +133,7 @@ type FmpzPolyRing <: Ring{Flint}
 
    function FmpzPolyRing(s::Symbol)
       return try
-         FmpzPolyID[s]
+         FmpzPolyID[s]::FmpzPolyRing
       catch
          FmpzPolyID[s] = new(FlintZZ, s)
       end
@@ -1206,7 +1206,7 @@ type FmpzMatSpace <: Ring{Flint}
 
    function FmpzMatSpace(r::Int, c::Int)
       return try
-         FmpzMatID[r, c]
+         FmpzMatID[r, c]::FmpzMatSpace
       catch
          FmpzMatID[r, c] = new(r, c, FlintZZ)
       end
@@ -1218,7 +1218,7 @@ type fmpz_mat <: MatElem{fmpz}
    r::Int
    c::Int
    rows::Ptr{Void}
-   parent::Ring{Flint}
+   parent::FmpzMatSpace
 
    # used by windows, not finalised!!
    function fmpz_mat()
@@ -1311,7 +1311,7 @@ type NmodMatSpace <: Ring{Flint}
     fmpz(typemax(UInt)) < abs(R.modulus) &&
       error("Modulus of ResidueRing must less then ", fmpz(typemax(UInt)))
     try
-      return NmodMatID[R, r, c]
+      return NmodMatID[R, r, c]::NmodMatSpace
     catch
       NmodMatID[R, r, c] = new(R, UInt(R.modulus), r, c)
     end

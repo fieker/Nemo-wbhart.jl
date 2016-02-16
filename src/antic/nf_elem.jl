@@ -5,7 +5,7 @@
 ###############################################################################
 
 export AnticNumberField, norm, trace, CyclotomicField, MaximalRealSubfield,
-       add!, sub!, mul!, signature
+       add!, sub!, mul!, norm_div, zero!, one!, gen!, signature
 
 ###############################################################################
 #
@@ -32,7 +32,7 @@ end
 ###############################################################################
 
 function hash(a::nf_elem)
-   h = 0xc2a44fbe466a1827
+   h = 0xc2a44fbe466a1827%UInt
    for i in 1:degree(parent(a)) + 1
          h $= hash(coeff(a, i))
          h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
@@ -68,6 +68,29 @@ function zero(a::AnticNumberField)
          (Ptr{nf_elem}, Ptr{AnticNumberField}), &r, &a)
    return r
 end
+
+function gen!(r::nf_elem)
+   a = parent(r)
+   ccall((:nf_elem_gen, :libflint), Void, 
+         (Ptr{nf_elem}, Ptr{AnticNumberField}), &r, &a)
+   return r
+end
+
+function one!(r::nf_elem)
+   a = parent(r)
+   ccall((:nf_elem_one, :libflint), Void, 
+         (Ptr{nf_elem}, Ptr{AnticNumberField}), &r, &a)
+   return r
+end
+
+function zero!(r::nf_elem)
+   a = parent(r)
+   ccall((:nf_elem_zero, :libflint), Void, 
+         (Ptr{nf_elem}, Ptr{AnticNumberField}), &r, &a)
+   return r
+end
+
+
 
 function isgen(a::nf_elem)
    return ccall((:nf_elem_is_gen, :libflint), Bool, 
@@ -304,6 +327,8 @@ end
 
 *(a::Integer, b::nf_elem) = b * a
 
+*(a::nf_elem, b::Integer) = a * fmpz(b)
+
 *(a::fmpq, b::nf_elem) = b * a
 
 //(a::nf_elem, b::Int) = divexact(a, b)
@@ -313,6 +338,8 @@ end
 //(a::nf_elem, b::Integer) = a//fmpz(b)
 
 //(a::nf_elem, b::fmpq) = divexact(a, b)
+
+//(a::Integer, b::nf_elem) = parent(b)(a)//b
 
 ###############################################################################
 #
@@ -421,6 +448,15 @@ function norm(a::nf_elem)
    return z
 end
 
+function norm_div(a::nf_elem, d::fmpz, nb::Int)
+   z = fmpq()
+   ccall((:nf_elem_norm_div, :libflint), Void,
+         (Ptr{fmpq}, Ptr{nf_elem}, Ptr{AnticNumberField}, Ptr{fmpz}, UInt),
+         &z, &a, &a.parent, &d, UInt(nb))
+   return z
+end
+
+
 function trace(a::nf_elem)
    z = fmpq()
    ccall((:nf_elem_trace, :libflint), Void,
@@ -456,6 +492,13 @@ end
 function add!(a::nf_elem, b::nf_elem, c::nf_elem)
    ccall((:nf_elem_add, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
+         &a, &b, &c, &a.parent)
+end
+
+function sub!(a::nf_elem, b::nf_elem, c::nf_elem)
+   ccall((:nf_elem_sub, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
+ 
          &a, &b, &c, &a.parent)
 end
 

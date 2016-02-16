@@ -11,7 +11,7 @@ export NmodPolyRing, nmod_poly, parent, base_ring, elem_type, length, zero,
        isirreducible, issquarefree, factor, factor_squarefree,
        factor_distinct_deg, factor_shape, setcoeff!, canonical_unit,
        add!, sub!, mul!, call, PolynomialRing, check_parent, gcdx, mod,
-       invmod, gcdinv, mulmod, powmod
+       invmod, gcdinv, mulmod, powmod, div, valuation
 
 ################################################################################
 #
@@ -47,7 +47,7 @@ degree(x::nmod_poly) = ccall((:nmod_poly_degree, :libflint), Int,
                                (Ptr{nmod_poly}, ), &x)
 
 function coeff(x::nmod_poly, n::Int)
-  n < 0 && throw(DomainError())
+  (n < 0 || n > degree(x)) && return base_ring(x)(0)
   return base_ring(x)(ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
           (Ptr{nmod_poly}, Int), &x, n))
 end
@@ -393,6 +393,10 @@ function divexact(x::nmod_poly, y::Residue{fmpz})
   return divexact(x, parent(x)(y))
 end
 
+#CF: div is neccessary for general Euc operations!
+
+div(x::nmod_poly, y::nmod_poly) = divexact(x,y)  # seems to do a Euclidean division anyhow....
+
 ################################################################################
 #
 #  Division with remainder
@@ -680,13 +684,13 @@ function factor(x::nmod_poly)
   fac = nmod_poly_factor(x._mod_n)
   ccall((:nmod_poly_factor, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}), &fac, &x)
-  res = Dict{nmod_poly,Int}()
+  res = Array(Tuple{nmod_poly,Int}, fac._num)
   for i in 1:fac._num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
     e = unsafe_load(fac.exp,i)
-    res[f] = e
+    res[i] = (f, e)
   end
   return res 
 end  
@@ -696,13 +700,13 @@ function factor_squarefree(x::nmod_poly)
   fac = nmod_poly_factor(x._mod_n)
   ccall((:nmod_poly_factor_squarefree, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}), &fac, &x)
-  res = Dict{nmod_poly,Int}()
+  res = Array(Tuple{nmod_poly,Int}, fac._num)
   for i in 1:fac._num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
     e = unsafe_load(fac.exp,i)
-    res[f] = e
+    res[i] = (f, e)
   end
   return res 
 end  
@@ -716,33 +720,60 @@ function factor_distinct_deg(x::nmod_poly)
   ccall((:nmod_poly_factor_distinct_deg, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}, Ptr{Ptr{Int}}),
           &fac, &x, degss)
-  res = Dict{nmod_poly,Int}()
+  res = Array(Tuple{nmod_poly,Int}, fac._num)
   for i in 1:fac._num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
-    res[f] = degs[i]        
+    res[i] = (f, degs[i])
   end
   return res 
 end  
 
-function factor_shape{T <: RingElem}(x::PolyElem{T})
-  res = Dict{Int, Int}()
+function factor_shape(x::nmod_poly)
+  res = Array(Int, degree(x))
+  res2 = Array(Int, degree(x))
+  res3 = Array(Tuple{Int, Int}, degree(x))
+  k = 1
+  fill!(res, 0)
   square_fac = factor_squarefree(x)
   for (f, i) in square_fac
     discdeg = factor_distinct_deg(f)
     for (g,j) in discdeg
-      num = div(degree(g), j)*i
-      if haskey(res, j)
-        res[j] += num
-      else
-        res[j] = num
-      end
+      num = div(degree(g), j)
+      res[j] += num*i
+      res2[k] = j
+      k += 1
     end
   end
-  return res
+  resize!(res2, k - 1)
+  res2 = unique(res2)
+  resize!(res3, length(res2))
+  for j in 1:length(res2)
+    res3[j] = (res2[j], res[res2[j]])
+  end
+  return res3
 end  
 
+################################################################################
+#
+# Valuation
+#
+################################################################################
+#CF TODO: use squaring for fast large valuation
+#         use divrem to combine steps
+
+function valuation(z::nmod_poly, p::nmod_poly)
+  check_parent(z,p)
+  z == 0 && error("Not yet implemented")
+  v = 0
+  while mod(z, p) == 0
+    z = div(z, p)
+    v += 1
+  end
+  return v, z
+end 
+  
 ################################################################################
 #
 #  Speedups for rings over nmod_poly

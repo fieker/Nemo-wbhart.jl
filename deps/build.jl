@@ -116,7 +116,7 @@ cd(wdir)
 # install ANTIC
 
 try
-  run(`git clone https://github.com/wbhart/antic.git`)
+  run(`git clone https://github.com/fieker/antic.git`)
 catch
   cd("$wdir/antic")
   run(`git pull`)
@@ -155,7 +155,7 @@ cd(wdir)
 # INSTALL ARB 
 
 try
-  run(`git clone https://github.com/fredrik-johansson/arb.git`)
+  run(`git clone https://github.com/thofma/arb.git`)
 catch
   cd("$wdir/arb")
   run(`git pull`)
@@ -170,11 +170,10 @@ if on_windows
    end
 else
    cd("$wdir/arb")
-   withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
-      run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`)
-      run(`make -j4`)
-      run(`make install`)
-   end
+   withenv(()->run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`), 
+                           "LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS)
+   run(`make -j4`)
+   run(`make install`)
 end
 
 cd(wdir)
