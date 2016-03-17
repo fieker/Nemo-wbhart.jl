@@ -84,7 +84,7 @@ function __init__()
       push!(Libdl.DL_LOAD_PATH, libdir)
    end
 
-   @linux || @osx ? begin
+   @linux ? begin
       ccall((:pari_set_memory_functions, libpari), Void,
          (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
          cglobal(:jl_malloc),
@@ -105,7 +105,7 @@ function __init__()
 
    unsafe_store!(pari_sigint, cfunction(pari_sigint_handler, Void, ()), 1)
 
-   @linux || @osx ? begin
+   @linux ? begin
       ccall((:__gmp_set_memory_functions, libgmp), Void,
          (Ptr{Void},Ptr{Void},Ptr{Void}),
          cglobal(:jl_gc_counted_malloc),
