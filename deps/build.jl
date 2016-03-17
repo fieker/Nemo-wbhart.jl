@@ -139,9 +139,9 @@ if on_windows
       download_dll("http://nemocas.org/binaries/w64-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
    end
    try
-      symlink(joinpath($vdir, "lib", "libflint.dll"), joinpath($vdir, "lib", "libflint-13.dll"))
+      symlink(joinpath(vdir, "lib", "libflint.dll"), joinpath(vdir, "lib", "libflint-13.dll"))
    catch
-      cp(joinpath($vdir, "lib", "libflint.dll"), joinpath($vdir, "lib", "libflint-13.dll"))
+      cp(joinpath(vdir, "lib", "libflint.dll"), joinpath(vdir, "lib", "libflint-13.dll"))
    end
 else
    cd("$wdir/flint2")
