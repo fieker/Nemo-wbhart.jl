@@ -59,7 +59,7 @@ cd(wdir)
 
 # install GMP/MPIR
 
-if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.2"))
+if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.2")) && !on_windows
    download("http://mpir.org/mpir-2.7.2.tar.bz2", joinpath(wdir, "mpir-2.7.2.tar.bz2"))
 end
 
