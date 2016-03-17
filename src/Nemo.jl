@@ -84,14 +84,14 @@ function __init__()
       push!(Libdl.DL_LOAD_PATH, libdir)
    end
  
-   @linux ? begin
+   @windows ? nothing : begin
       ccall((:pari_set_memory_functions, libpari), Void,
          (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
          cglobal(:jl_malloc),
          cglobal(:jl_calloc),
          cglobal(:jl_realloc),
          cglobal(:jl_free))
-   end : nothing
+   end
 
    ccall((:pari_init, libpari), Void, (Int, Int), 300000000, 10000)
   
@@ -105,7 +105,7 @@ function __init__()
 
    unsafe_store!(pari_sigint, cfunction(pari_sigint_handler, Void, ()), 1)
 
-   @linux ? begin
+   @windows ? nothing : begin
       ccall((:__gmp_set_memory_functions, libgmp), Void,
          (Ptr{Void},Ptr{Void},Ptr{Void}),
          cglobal(:jl_gc_counted_malloc),
@@ -118,7 +118,7 @@ function __init__()
          cglobal(:jl_calloc),
          cglobal(:jl_realloc),
          cglobal(:jl_free))
-   end : nothing
+   end
 
    println("")
    println("Welcome to Nemo version 0.4.0")
