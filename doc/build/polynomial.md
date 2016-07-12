@@ -12,15 +12,15 @@ Nemo allow the creation of dense, univariate polynomials over any computable rin
 The following table shows each of the polynomial types available in Nemo, the base ring $R$, and the Julia/Nemo types for that kind of polynomial (the type information is mainly of concern to developers).
 
 
-|                            Base ring | Library |    Element type |       Parent type |
-| ------------------------------------:| -------:| ---------------:| -----------------:|
-|                     Generic ring $R$ |    Nemo |    `GenPoly{T}` |  `GenPolyRing{T}` |
-|                         $\mathbb{Z}$ |   Flint |     `fmpz_poly` |    `FmpzPolyRing` |
-| $\mathbb{Z}/n\mathbb{Z}$ (small $n$) |   Flint |     `nmod_poly` |    `NmodPolyRing` |
-| $\mathbb{Z}/n\mathbb{Z}$ (large $n$) |   Flint | `fmpz_mod_poly` | `FmpzModPolyRing` |
-|                         $\mathbb{Q}$ |   Flint |     `fmpq_poly` |    `FmpqPolyRing` |
-|       $\mathbb{F}_{p^n}$ (small $n$) |   Flint |  `fq_nmod_poly` |  `FqNmodPolyRing` |
-|       $\mathbb{F}_{p^n}$ (large $n$) |   Flint |       `fq_poly` |      `FqPolyRing` |
+                           Base ring | Library |    Element type |       Parent type
+-----------------------------------: | ------: | --------------: | ----------------:
+                    Generic ring $R$ |    Nemo |    `GenPoly{T}` |  `GenPolyRing{T}`
+                        $\mathbb{Z}$ |   Flint |     `fmpz_poly` |    `FmpzPolyRing`
+$\mathbb{Z}/n\mathbb{Z}$ (small $n$) |   Flint |     `nmod_poly` |    `NmodPolyRing`
+$\mathbb{Z}/n\mathbb{Z}$ (large $n$) |   Flint | `fmpz_mod_poly` | `FmpzModPolyRing`
+                        $\mathbb{Q}$ |   Flint |     `fmpq_poly` |    `FmpqPolyRing`
+      $\mathbb{F}_{p^n}$ (small $n$) |   Flint |  `fq_nmod_poly` |  `FqNmodPolyRing`
+      $\mathbb{F}_{p^n}$ (large $n$) |   Flint |       `fq_poly` |      `FqPolyRing`
 
 
 The string representation of the variable and the base ring $R$ of a generic polynomial is stored in its parent object. 
@@ -41,13 +41,7 @@ In order to construct polynomials in Nemo, one must first construct the polynomi
 
 
 
-```
-PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
-```
-
-> Given a base ring `R` and string `s` specifying how the generator (variable) should be printed, return a tuple `S, x` representing the new polynomial ring $S = R[x]$ and the generator $x$ of the ring. By default the parent object `S` will depend only on `R` and `x` and will be cached. Setting the optional argument `cached` to `false` will prevent the parent object `S` from being cached.
-
-
+nothing
 
 A shorthand version of this function is provided: given a base ring `R`, we abbreviate the constructor as follows.
 
@@ -86,7 +80,7 @@ The easiest way is simply using the generator returned by the `PolynomialRing` c
 
 In addition we provide the following functions for constructing certain useful polynomials.
 
-<a id='Base.zero-Tuple{Nemo.PolyRing}' href='#Base.zero-Tuple{Nemo.PolyRing}'>#</a>
+<a id='Base.zero-Tuple{Nemo.PolyRing{T}}' href='#Base.zero-Tuple{Nemo.PolyRing{T}}'>#</a>
 **`Base.zero`** &mdash; *Method*.
 
 
@@ -98,7 +92,7 @@ zero(R::PolyRing)
 > Return the zero polynomial in the given polynomial ring.
 
 
-<a id='Base.one-Tuple{Nemo.PolyRing}' href='#Base.one-Tuple{Nemo.PolyRing}'>#</a>
+<a id='Base.one-Tuple{Nemo.PolyRing{T}}' href='#Base.one-Tuple{Nemo.PolyRing{T}}'>#</a>
 **`Base.one`** &mdash; *Method*.
 
 
@@ -110,7 +104,7 @@ one(R::PolyRing)
 > Return the constant polynomial $1$ in the given polynomial ring.
 
 
-<a id='Nemo.gen-Tuple{Nemo.PolyRing}' href='#Nemo.gen-Tuple{Nemo.PolyRing}'>#</a>
+<a id='Nemo.gen-Tuple{Nemo.PolyRing{T}}' href='#Nemo.gen-Tuple{Nemo.PolyRing{T}}'>#</a>
 **`Nemo.gen`** &mdash; *Method*.
 
 
@@ -317,7 +311,7 @@ Typically a developer will also overload the `PolynomialRing` generic function t
 
 Numerous functions are provided to manipulate polynomials and to set and retrieve coefficients and other basic data associated with the polynomials. Also see the section on basic functionality above.
 
-<a id='Nemo.base_ring-Tuple{Nemo.PolyRing}' href='#Nemo.base_ring-Tuple{Nemo.PolyRing}'>#</a>
+<a id='Nemo.base_ring-Tuple{Nemo.PolyRing{T}}' href='#Nemo.base_ring-Tuple{Nemo.PolyRing{T}}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
 
 
@@ -329,7 +323,7 @@ base_ring(R::PolyRing)
 > Return the base ring of the given polynomial ring.
 
 
-<a id='Nemo.base_ring-Tuple{Nemo.PolyElem}' href='#Nemo.base_ring-Tuple{Nemo.PolyElem}'>#</a>
+<a id='Nemo.base_ring-Tuple{Nemo.PolyElem{T}}' href='#Nemo.base_ring-Tuple{Nemo.PolyElem{T}}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
 
 
@@ -341,7 +335,7 @@ base_ring(a::PolyElem)
 > Return the base ring of the polynomial ring of the given polynomial.
 
 
-<a id='Base.parent-Tuple{Nemo.PolyElem}' href='#Base.parent-Tuple{Nemo.PolyElem}'>#</a>
+<a id='Base.parent-Tuple{Nemo.PolyElem{T}}' href='#Base.parent-Tuple{Nemo.PolyElem{T}}'>#</a>
 **`Base.parent`** &mdash; *Method*.
 
 
@@ -353,7 +347,7 @@ parent(a::PolyElem)
 > Return the parent of the given polynomial.
 
 
-<a id='Base.var-Tuple{Nemo.PolyRing}' href='#Base.var-Tuple{Nemo.PolyRing}'>#</a>
+<a id='Base.var-Tuple{Nemo.PolyRing{T}}' href='#Base.var-Tuple{Nemo.PolyRing{T}}'>#</a>
 **`Base.var`** &mdash; *Method*.
 
 
@@ -365,7 +359,7 @@ var(a::PolyRing)
 > Return the internal name of the generator of the polynomial ring. Note that this is returned as a `Symbol` not a `String`.
 
 
-<a id='Nemo.degree-Tuple{Nemo.PolyElem}' href='#Nemo.degree-Tuple{Nemo.PolyElem}'>#</a>
+<a id='Nemo.degree-Tuple{Nemo.PolyElem{T}}' href='#Nemo.degree-Tuple{Nemo.PolyElem{T}}'>#</a>
 **`Nemo.degree`** &mdash; *Method*.
 
 
@@ -377,7 +371,7 @@ degree(a::PolyElem)
 > Return the degree of the given polynomial. This is defined to be one less than the length, even for constant polynomials.
 
 
-<a id='Nemo.modulus-Tuple{Nemo.PolyElem{T<:Nemo.ResElem}}' href='#Nemo.modulus-Tuple{Nemo.PolyElem{T<:Nemo.ResElem}}'>#</a>
+<a id='Nemo.modulus-Tuple{Nemo.PolyElem{T<:Nemo.ResElem{T}}}' href='#Nemo.modulus-Tuple{Nemo.PolyElem{T<:Nemo.ResElem{T}}}'>#</a>
 **`Nemo.modulus`** &mdash; *Method*.
 
 
@@ -389,7 +383,7 @@ modulus{T <: ResElem}(a::PolyElem{T})
 > Return the modulus of the coefficients of the given polynomial.
 
 
-<a id='Nemo.lead-Tuple{Nemo.PolyElem}' href='#Nemo.lead-Tuple{Nemo.PolyElem}'>#</a>
+<a id='Nemo.lead-Tuple{Nemo.PolyElem{T}}' href='#Nemo.lead-Tuple{Nemo.PolyElem{T}}'>#</a>
 **`Nemo.lead`** &mdash; *Method*.
 
 
@@ -401,7 +395,7 @@ lead(x::PolyElem)
 > Return the leading coefficient of the given polynomial. This will be the nonzero coefficient of the term with highest degree unless the polynomial in the zero polynomial, in which case a zero coefficient is returned.
 
 
-<a id='Nemo.iszero-Tuple{Nemo.PolyElem}' href='#Nemo.iszero-Tuple{Nemo.PolyElem}'>#</a>
+<a id='Nemo.iszero-Tuple{Nemo.PolyElem{T}}' href='#Nemo.iszero-Tuple{Nemo.PolyElem{T}}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
 
 
@@ -413,7 +407,7 @@ iszero(a::PolyElem)
 > Return `true` if the given polynomial is zero, otherwise return `false`.
 
 
-<a id='Nemo.isone-Tuple{Nemo.PolyElem}' href='#Nemo.isone-Tuple{Nemo.PolyElem}'>#</a>
+<a id='Nemo.isone-Tuple{Nemo.PolyElem{T}}' href='#Nemo.isone-Tuple{Nemo.PolyElem{T}}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
 
 
@@ -425,7 +419,7 @@ isone(a::PolyElem)
 > Return `true` if the given polynomial is the constant polynomial $1$, otherwise return `false`.
 
 
-<a id='Nemo.isgen-Tuple{Nemo.PolyElem}' href='#Nemo.isgen-Tuple{Nemo.PolyElem}'>#</a>
+<a id='Nemo.isgen-Tuple{Nemo.PolyElem{T}}' href='#Nemo.isgen-Tuple{Nemo.PolyElem{T}}'>#</a>
 **`Nemo.isgen`** &mdash; *Method*.
 
 
@@ -437,7 +431,7 @@ isgen(a::PolyElem)
 > Return `true` if the given polynomial is the constant generator of its polynomial ring, otherwise return `false`.
 
 
-<a id='Nemo.isunit-Tuple{Nemo.PolyElem}' href='#Nemo.isunit-Tuple{Nemo.PolyElem}'>#</a>
+<a id='Nemo.isunit-Tuple{Nemo.PolyElem{T}}' href='#Nemo.isunit-Tuple{Nemo.PolyElem{T}}'>#</a>
 **`Nemo.isunit`** &mdash; *Method*.
 
 
@@ -500,16 +494,9 @@ q = den(c)
 
 All the usual arithmetic operators are overloaded for Nemo polynomials. Note that Julia uses the single slash for floating point division. Therefore to perform exact division in a ring we use `divexact`. To construct an element of a fraction field one can use the double slash operator `//`.
 
-<a id='Base.--Tuple{Nemo.PolyElem}' href='#Base.--Tuple{Nemo.PolyElem}'>#</a>
+<a id='Base.--Tuple{Nemo.PolyElem{T}}' href='#Base.--Tuple{Nemo.PolyElem{T}}'>#</a>
 **`Base.-`** &mdash; *Method*.
 
-
-
-```
--(x)
-```
-
-Unary minus operator.
 
 
 ```
@@ -518,6 +505,12 @@ Unary minus operator.
 
 > Return $-a$.
 
+
+```
+-(x)
+```
+
+Unary minus operator.
 
 <a id='Base.+-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Nemo.PolyElem{T<:Nemo.RingElem}}' href='#Base.+-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Nemo.PolyElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.+`** &mdash; *Method*.
@@ -531,13 +524,11 @@ Unary minus operator.
 > Return $a + b$.
 
 
-
 ```
 +{T <: RingElem}(a::T, b::PolyElem{T})
 ```
 
 > Return $a + b$.
-
 
 
 ```
@@ -553,26 +544,10 @@ Unary minus operator.
 
 
 ```
--(x, y)
-```
-
-Subtraction operator.
-
-
-```
 -{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 ```
 
 > Return $a - b$.
-
-
-
-```
--{T <: RingElem}(a::T, b::PolyElem{T})
-```
-
-> Return $a - b$.
-
 
 
 ```
@@ -582,16 +557,22 @@ Subtraction operator.
 > Return $a - b$.
 
 
+```
+-{T <: RingElem}(a::T, b::PolyElem{T})
+```
+
+> Return $a - b$.
+
+
+```
+-(x, y)
+```
+
+Subtraction operator.
+
 <a id='Base.*-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Nemo.PolyElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Nemo.PolyElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.*`** &mdash; *Method*.
 
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
 
 
 ```
@@ -601,13 +582,11 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $a\times b$.
 
 
-
 ```
 *{T <: RingElem}(a::T, b::PolyElem{T})
 ```
 
 > Return $a\times b$.
-
 
 
 ```
@@ -617,17 +596,22 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $a\times b$.
 
 
-<a id='Nemo.divexact-Tuple{Nemo.PolyElem,Nemo.PolyElem}' href='#Nemo.divexact-Tuple{Nemo.PolyElem,Nemo.PolyElem}'>#</a>
+```
+*(x, y...)
+```
+
+Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+
+<a id='Nemo.divexact-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Nemo.PolyElem{T<:Nemo.RingElem}}' href='#Nemo.divexact-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Nemo.PolyElem{T<:Nemo.RingElem}}'>#</a>
 **`Nemo.divexact`** &mdash; *Method*.
 
 
 
 ```
-divexact(a::PolyElem, b::PolyElem)
+divexact{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 ```
 
 > Return $a/b$ where the quotient is expected to be exact.
-
 
 
 ```
@@ -638,57 +622,9 @@ divexact{T <: RingElem}(a::PolyElem{T}, b::T)
 
 
 
-```
-divexact(a::PolyElem, b::Integer)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-
-```
-divexact(a::PolyElem, b::fmpz)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-
-```
-divexact(a::SeriesElem, b::SeriesElem)
-```
-
-> Return $a/b$. Requires $b$ to be invertible.
-
-
-
-```
-divexact{T <: RingElem}(a::SeriesElem{T}, b::Integer)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-
-```
-divexact{T <: RingElem}(a::SeriesElem{T}, b::fmpz)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-
-```
-divexact{T <: RingElem}(a::SeriesElem{T}, b::T)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-
 The following ad hoc operators are also provided.
 
-<a id='Base.+-Tuple{Integer,Nemo.PolyElem}' href='#Base.+-Tuple{Integer,Nemo.PolyElem}'>#</a>
+<a id='Base.+-Tuple{Integer,Nemo.PolyElem{T}}' href='#Base.+-Tuple{Integer,Nemo.PolyElem{T}}'>#</a>
 **`Base.+`** &mdash; *Method*.
 
 
@@ -700,7 +636,7 @@ The following ad hoc operators are also provided.
 > Return $a + b$.
 
 
-<a id='Base.+-Tuple{Nemo.PolyElem,Integer}' href='#Base.+-Tuple{Nemo.PolyElem,Integer}'>#</a>
+<a id='Base.+-Tuple{Nemo.PolyElem{T},Integer}' href='#Base.+-Tuple{Nemo.PolyElem{T},Integer}'>#</a>
 **`Base.+`** &mdash; *Method*.
 
 
@@ -712,7 +648,7 @@ The following ad hoc operators are also provided.
 > Return $a + b$.
 
 
-<a id='Base.+-Tuple{Nemo.fmpz,Nemo.PolyElem}' href='#Base.+-Tuple{Nemo.fmpz,Nemo.PolyElem}'>#</a>
+<a id='Base.+-Tuple{Nemo.fmpz,Nemo.PolyElem{T}}' href='#Base.+-Tuple{Nemo.fmpz,Nemo.PolyElem{T}}'>#</a>
 **`Base.+`** &mdash; *Method*.
 
 
@@ -724,7 +660,7 @@ The following ad hoc operators are also provided.
 > Return $a + b$.
 
 
-<a id='Base.+-Tuple{Nemo.PolyElem,Nemo.fmpz}' href='#Base.+-Tuple{Nemo.PolyElem,Nemo.fmpz}'>#</a>
+<a id='Base.+-Tuple{Nemo.PolyElem{T},Nemo.fmpz}' href='#Base.+-Tuple{Nemo.PolyElem{T},Nemo.fmpz}'>#</a>
 **`Base.+`** &mdash; *Method*.
 
 
@@ -748,47 +684,8 @@ The following ad hoc operators are also provided.
 > Return $a + b$.
 
 
-<a id='Base.+-Tuple{Nemo.PolyElem,T<:Nemo.RingElem}' href='#Base.+-Tuple{Nemo.PolyElem,T<:Nemo.RingElem}'>#</a>
+<a id='Base.+-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.+-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
 **`Base.+`** &mdash; *Method*.
-
-
-
-```
-+(x, y...)
-```
-
-Addition operator. `x+y+z+...` calls this function with all arguments, i.e. `+(x, y, z, ...)`.
-
-
-```
-+{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
-```
-
-> Return $a + b$.
-
-
-
-```
-+{T <: RingElem}(a::T, b::PolyElem{T})
-```
-
-> Return $a + b$.
-
-
-
-```
-+(a::Integer, b::PolyElem)
-```
-
-> Return $a + b$.
-
-
-
-```
-+(a::fmpz, b::PolyElem)
-```
-
-> Return $a + b$.
 
 
 
@@ -799,88 +696,9 @@ Addition operator. `x+y+z+...` calls this function with all arguments, i.e. `+(x
 > Return $a + b$.
 
 
-
-```
-+(a::PolyElem, b::Integer)
-```
-
-> Return $a + b$.
-
-
-
-```
-+(a::PolyElem, b::fmpz)
-```
-
-> Return $a + b$.
-
-
-
-```
-+{T <: RingElem}(a::SeriesElem{T}, b::SeriesElem{T})
-```
-
-> Return $a + b$.
-
-
-
-```
-+{T <: RingElem}(a::T, b::SeriesElem{T})
-```
-
-> Return $a + b$.
-
-
-
-```
-+(a::Integer, b::SeriesElem)
-```
-
-> Return $a + b$.
-
-
-
-```
-+(a::fmpz, b::SeriesElem)
-```
-
-> Return $a + b$.
-
-
-
-```
-+{T <: RingElem}(a::SeriesElem{T}, b::T)
-```
-
-> Return $a + b$.
-
-
-
-```
-+(a::SeriesElem, b::Integer)
-```
-
-> Return $a + b$.
-
-
-
-```
-+(a::SeriesElem, b::fmpz)
-```
-
-> Return $a + b$.
-
-
-<a id='Base.--Tuple{Integer,Nemo.PolyElem}' href='#Base.--Tuple{Integer,Nemo.PolyElem}'>#</a>
+<a id='Base.--Tuple{Integer,Nemo.PolyElem{T}}' href='#Base.--Tuple{Integer,Nemo.PolyElem{T}}'>#</a>
 **`Base.-`** &mdash; *Method*.
 
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
 
 
 ```
@@ -890,16 +708,15 @@ Subtraction operator.
 > Return $a - b$.
 
 
-<a id='Base.--Tuple{Nemo.PolyElem,Integer}' href='#Base.--Tuple{Nemo.PolyElem,Integer}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
 ```
 -(x, y)
 ```
 
 Subtraction operator.
+
+<a id='Base.--Tuple{Nemo.PolyElem{T},Integer}' href='#Base.--Tuple{Nemo.PolyElem{T},Integer}'>#</a>
+**`Base.-`** &mdash; *Method*.
+
 
 
 ```
@@ -909,16 +726,15 @@ Subtraction operator.
 > Return $a - b$.
 
 
-<a id='Base.--Tuple{Nemo.fmpz,Nemo.PolyElem}' href='#Base.--Tuple{Nemo.fmpz,Nemo.PolyElem}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
 ```
 -(x, y)
 ```
 
 Subtraction operator.
+
+<a id='Base.--Tuple{Nemo.fmpz,Nemo.PolyElem{T}}' href='#Base.--Tuple{Nemo.fmpz,Nemo.PolyElem{T}}'>#</a>
+**`Base.-`** &mdash; *Method*.
+
 
 
 ```
@@ -928,16 +744,15 @@ Subtraction operator.
 > Return $a - b$.
 
 
-<a id='Base.--Tuple{Nemo.PolyElem,Nemo.fmpz}' href='#Base.--Tuple{Nemo.PolyElem,Nemo.fmpz}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
 ```
 -(x, y)
 ```
 
 Subtraction operator.
+
+<a id='Base.--Tuple{Nemo.PolyElem{T},Nemo.fmpz}' href='#Base.--Tuple{Nemo.PolyElem{T},Nemo.fmpz}'>#</a>
+**`Base.-`** &mdash; *Method*.
+
 
 
 ```
@@ -947,16 +762,15 @@ Subtraction operator.
 > Return $a - b$.
 
 
-<a id='Base.--Tuple{T<:Nemo.RingElem,Nemo.PolyElem{T<:Nemo.RingElem}}' href='#Base.--Tuple{T<:Nemo.RingElem,Nemo.PolyElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
 ```
 -(x, y)
 ```
 
 Subtraction operator.
+
+<a id='Base.--Tuple{T<:Nemo.RingElem,Nemo.PolyElem{T<:Nemo.RingElem}}' href='#Base.--Tuple{T<:Nemo.RingElem,Nemo.PolyElem{T<:Nemo.RingElem}}'>#</a>
+**`Base.-`** &mdash; *Method*.
+
 
 
 ```
@@ -966,9 +780,22 @@ Subtraction operator.
 > Return $a - b$.
 
 
-<a id='Base.--Tuple{Nemo.PolyElem,T<:Nemo.RingElem}' href='#Base.--Tuple{Nemo.PolyElem,T<:Nemo.RingElem}'>#</a>
+```
+-(x, y)
+```
+
+Subtraction operator.
+
+<a id='Base.--Tuple{Nemo.PolyElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.--Tuple{Nemo.PolyElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
 **`Base.-`** &mdash; *Method*.
 
+
+
+```
+-{T <: RingElem}(a::PolyElem{T}, b::T)
+```
+
+> Return $a - b$.
 
 
 ```
@@ -977,16 +804,9 @@ Subtraction operator.
 
 Subtraction operator.
 
-<a id='Base.*-Tuple{Integer,Nemo.PolyElem}' href='#Base.*-Tuple{Integer,Nemo.PolyElem}'>#</a>
+<a id='Base.*-Tuple{Integer,Nemo.PolyElem{T}}' href='#Base.*-Tuple{Integer,Nemo.PolyElem{T}}'>#</a>
 **`Base.*`** &mdash; *Method*.
 
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
 
 
 ```
@@ -996,16 +816,15 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $a\times b$.
 
 
-<a id='Base.*-Tuple{Nemo.PolyElem,Integer}' href='#Base.*-Tuple{Nemo.PolyElem,Integer}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
 ```
 *(x, y...)
 ```
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+
+<a id='Base.*-Tuple{Nemo.PolyElem{T},Integer}' href='#Base.*-Tuple{Nemo.PolyElem{T},Integer}'>#</a>
+**`Base.*`** &mdash; *Method*.
+
 
 
 ```
@@ -1015,16 +834,15 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $a\times b$.
 
 
-<a id='Base.*-Tuple{Nemo.fmpz,Nemo.PolyElem}' href='#Base.*-Tuple{Nemo.fmpz,Nemo.PolyElem}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
 ```
 *(x, y...)
 ```
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+
+<a id='Base.*-Tuple{Nemo.fmpz,Nemo.PolyElem{T}}' href='#Base.*-Tuple{Nemo.fmpz,Nemo.PolyElem{T}}'>#</a>
+**`Base.*`** &mdash; *Method*.
+
 
 
 ```
@@ -1034,16 +852,15 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $a\times b$.
 
 
-<a id='Base.*-Tuple{Nemo.PolyElem,Nemo.fmpz}' href='#Base.*-Tuple{Nemo.PolyElem,Nemo.fmpz}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
 ```
 *(x, y...)
 ```
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+
+<a id='Base.*-Tuple{Nemo.PolyElem{T},Nemo.fmpz}' href='#Base.*-Tuple{Nemo.PolyElem{T},Nemo.fmpz}'>#</a>
+**`Base.*`** &mdash; *Method*.
+
 
 
 ```
@@ -1053,16 +870,15 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $a\times b$.
 
 
-<a id='Base.*-Tuple{T<:Nemo.RingElem,Nemo.PolyElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{T<:Nemo.RingElem,Nemo.PolyElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
 ```
 *(x, y...)
 ```
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+
+<a id='Base.*-Tuple{T<:Nemo.RingElem,Nemo.PolyElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{T<:Nemo.RingElem,Nemo.PolyElem{T<:Nemo.RingElem}}'>#</a>
+**`Base.*`** &mdash; *Method*.
+
 
 
 ```
@@ -1072,9 +888,22 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $a\times b$.
 
 
-<a id='Base.*-Tuple{Nemo.PolyElem,T<:Nemo.RingElem}' href='#Base.*-Tuple{Nemo.PolyElem,T<:Nemo.RingElem}'>#</a>
+```
+*(x, y...)
+```
+
+Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+
+<a id='Base.*-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.*-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
 **`Base.*`** &mdash; *Method*.
 
+
+
+```
+*{T <: RingElem}(a::PolyElem{T}, b::T)
+```
+
+> Return $a\times b$.
 
 
 ```
@@ -1083,7 +912,7 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
 
-<a id='Nemo.divexact-Tuple{Nemo.PolyElem,Integer}' href='#Nemo.divexact-Tuple{Nemo.PolyElem,Integer}'>#</a>
+<a id='Nemo.divexact-Tuple{Nemo.PolyElem{T},Integer}' href='#Nemo.divexact-Tuple{Nemo.PolyElem{T},Integer}'>#</a>
 **`Nemo.divexact`** &mdash; *Method*.
 
 
@@ -1095,7 +924,7 @@ divexact(a::PolyElem, b::Integer)
 > Return $a/b$ where the quotient is expected to be exact.
 
 
-<a id='Nemo.divexact-Tuple{Nemo.PolyElem,Nemo.fmpz}' href='#Nemo.divexact-Tuple{Nemo.PolyElem,Nemo.fmpz}'>#</a>
+<a id='Nemo.divexact-Tuple{Nemo.PolyElem{T},Nemo.fmpz}' href='#Nemo.divexact-Tuple{Nemo.PolyElem{T},Nemo.fmpz}'>#</a>
 **`Nemo.divexact`** &mdash; *Method*.
 
 
@@ -1119,7 +948,7 @@ divexact{T <: RingElem}(a::PolyElem{T}, b::T)
 > Return $a/b$ where the quotient is expected to be exact.
 
 
-<a id='Base.^-Tuple{Nemo.PolyElem,Int64}' href='#Base.^-Tuple{Nemo.PolyElem,Int64}'>#</a>
+<a id='Base.^-Tuple{Nemo.PolyElem{T},Int64}' href='#Base.^-Tuple{Nemo.PolyElem{T},Int64}'>#</a>
 **`Base.^`** &mdash; *Method*.
 
 
@@ -1175,13 +1004,11 @@ The following comparison operators are implemented for polynomials in Nemo.
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall that power series to different precisions may still be arithmetically equal to the minimum of the two precisions.
 
 
-
 ```
 =={T <: RingElem}(x::PolyElem{T}, y::T)
 ```
 
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
 
 
 ```
@@ -1230,7 +1057,7 @@ In addition we have the following ad hoc comparison operators.
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 
 
-<a id='Base.==-Tuple{Nemo.PolyElem,Integer}' href='#Base.==-Tuple{Nemo.PolyElem,Integer}'>#</a>
+<a id='Base.==-Tuple{Nemo.PolyElem{T},Integer}' href='#Base.==-Tuple{Nemo.PolyElem{T},Integer}'>#</a>
 **`Base.==`** &mdash; *Method*.
 
 
@@ -1242,7 +1069,7 @@ In addition we have the following ad hoc comparison operators.
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 
 
-<a id='Base.==-Tuple{Integer,Nemo.PolyElem}' href='#Base.==-Tuple{Integer,Nemo.PolyElem}'>#</a>
+<a id='Base.==-Tuple{Integer,Nemo.PolyElem{T}}' href='#Base.==-Tuple{Integer,Nemo.PolyElem{T}}'>#</a>
 **`Base.==`** &mdash; *Method*.
 
 
@@ -1254,7 +1081,7 @@ In addition we have the following ad hoc comparison operators.
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 
 
-<a id='Base.==-Tuple{Nemo.PolyElem,Nemo.fmpz}' href='#Base.==-Tuple{Nemo.PolyElem,Nemo.fmpz}'>#</a>
+<a id='Base.==-Tuple{Nemo.PolyElem{T},Nemo.fmpz}' href='#Base.==-Tuple{Nemo.PolyElem{T},Nemo.fmpz}'>#</a>
 **`Base.==`** &mdash; *Method*.
 
 
@@ -1266,7 +1093,7 @@ In addition we have the following ad hoc comparison operators.
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 
 
-<a id='Base.==-Tuple{Nemo.fmpz,Nemo.PolyElem}' href='#Base.==-Tuple{Nemo.fmpz,Nemo.PolyElem}'>#</a>
+<a id='Base.==-Tuple{Nemo.fmpz,Nemo.PolyElem{T}}' href='#Base.==-Tuple{Nemo.fmpz,Nemo.PolyElem{T}}'>#</a>
 **`Base.==`** &mdash; *Method*.
 
 
@@ -1302,7 +1129,7 @@ h == fmpz(3)
 
 ## Truncation
 
-<a id='Base.truncate-Tuple{Nemo.PolyElem,Int64}' href='#Base.truncate-Tuple{Nemo.PolyElem,Int64}'>#</a>
+<a id='Base.truncate-Tuple{Nemo.PolyElem{T},Int64}' href='#Base.truncate-Tuple{Nemo.PolyElem{T},Int64}'>#</a>
 **`Base.truncate`** &mdash; *Method*.
 
 
@@ -1346,7 +1173,7 @@ k = mullow(f, g, 4)
 
 ## Reversal
 
-<a id='Base.reverse-Tuple{Nemo.PolyElem,Int64}' href='#Base.reverse-Tuple{Nemo.PolyElem,Int64}'>#</a>
+<a id='Base.reverse-Tuple{Nemo.PolyElem{T},Int64}' href='#Base.reverse-Tuple{Nemo.PolyElem{T},Int64}'>#</a>
 **`Base.reverse`** &mdash; *Method*.
 
 
@@ -1358,7 +1185,7 @@ reverse(x::PolyElem, len::Int)
 > Return the reverse of the polynomial $x$, thought of as a polynomial of the given length (the polynomial will be notionally truncated or padded with zeroes before the leading term if necessary to match the specified length).  The resulting polynomial is normalised. If `len` is negative we throw a `DomainError()`.
 
 
-<a id='Base.reverse-Tuple{Nemo.PolyElem}' href='#Base.reverse-Tuple{Nemo.PolyElem}'>#</a>
+<a id='Base.reverse-Tuple{Nemo.PolyElem{T}}' href='#Base.reverse-Tuple{Nemo.PolyElem{T}}'>#</a>
 **`Base.reverse`** &mdash; *Method*.
 
 
@@ -1389,7 +1216,7 @@ h = reverse(f)
 
 ## Shifting
 
-<a id='Nemo.shift_left-Tuple{Nemo.PolyElem,Int64}' href='#Nemo.shift_left-Tuple{Nemo.PolyElem,Int64}'>#</a>
+<a id='Nemo.shift_left-Tuple{Nemo.PolyElem{T},Int64}' href='#Nemo.shift_left-Tuple{Nemo.PolyElem{T},Int64}'>#</a>
 **`Nemo.shift_left`** &mdash; *Method*.
 
 
@@ -1401,7 +1228,7 @@ shift_left(x::PolyElem, n::Int)
 > Return the polynomial $f$ shifted left by $n$ terms, i.e. multiplied by $x^n$.
 
 
-<a id='Nemo.shift_right-Tuple{Nemo.PolyElem,Int64}' href='#Nemo.shift_right-Tuple{Nemo.PolyElem,Int64}'>#</a>
+<a id='Nemo.shift_right-Tuple{Nemo.PolyElem{T},Int64}' href='#Nemo.shift_right-Tuple{Nemo.PolyElem{T},Int64}'>#</a>
 **`Nemo.shift_right`** &mdash; *Method*.
 
 
@@ -1435,7 +1262,7 @@ h = shift_right(f, 2)
 
 For polynomials over a field or residue ring, we can reduce modulo a given polynomial. This isn't always well-defined in the case of a residue ring, but when it is well-defined, we obtain the correct result. If Nemo encounters an impossible inverse, an exception will be raised.
 
-<a id='Nemo.mulmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}' href='#Nemo.mulmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}'>#</a>
+<a id='Nemo.mulmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}' href='#Nemo.mulmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}'>#</a>
 **`Nemo.mulmod`** &mdash; *Method*.
 
 
@@ -1447,7 +1274,7 @@ mulmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T}, d::PolyEl
 > Return $a\times b \pmod{d}$.
 
 
-<a id='Nemo.powmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Int64,Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}' href='#Nemo.powmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Int64,Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}'>#</a>
+<a id='Nemo.powmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Int64,Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}' href='#Nemo.powmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Int64,Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}'>#</a>
 **`Nemo.powmod`** &mdash; *Method*.
 
 
@@ -1471,7 +1298,7 @@ powmod(x::fmpz_mod_poly, e::fmpz, y::fmpz_mod_poly)
 > Return $x^e \pmod{y}$.
 
 
-<a id='Base.invmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}' href='#Base.invmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}'>#</a>
+<a id='Base.invmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}' href='#Base.invmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}'>#</a>
 **`Base.invmod`** &mdash; *Method*.
 
 
@@ -1509,7 +1336,7 @@ powmod(f, 3, h)
 
 For polynomials over a field, we have a euclidean domain, and in many cases for polynomials over a residue ring things behave as though we had a euclidean domain so long as we don't hit an impossible inverse. For such rings we define euclidean division of polynomials. If an impossible inverse is hit, we raise an exception.
 
-<a id='Base.mod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}' href='#Base.mod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}'>#</a>
+<a id='Base.mod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}' href='#Base.mod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}'>#</a>
 **`Base.mod`** &mdash; *Method*.
 
 
@@ -1521,7 +1348,7 @@ mod{T <: Union{ResElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
 > Return $f \pmod{g}$.
 
 
-<a id='Base.divrem-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}' href='#Base.divrem-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}'>#</a>
+<a id='Base.divrem-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}' href='#Base.divrem-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}'>#</a>
 **`Base.divrem`** &mdash; *Method*.
 
 
@@ -1635,7 +1462,7 @@ lcm{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 > Return a least common multiple of $a$ and $b$ if it exists.
 
 
-<a id='Nemo.content-Tuple{Nemo.PolyElem}' href='#Nemo.content-Tuple{Nemo.PolyElem}'>#</a>
+<a id='Nemo.content-Tuple{Nemo.PolyElem{T}}' href='#Nemo.content-Tuple{Nemo.PolyElem{T}}'>#</a>
 **`Nemo.content`** &mdash; *Method*.
 
 
@@ -1647,7 +1474,7 @@ content(a::PolyElem)
 > Return the content of $a$, i.e. the greatest common divisor of its coefficients.
 
 
-<a id='Nemo.primpart-Tuple{Nemo.PolyElem}' href='#Nemo.primpart-Tuple{Nemo.PolyElem}'>#</a>
+<a id='Nemo.primpart-Tuple{Nemo.PolyElem{T}}' href='#Nemo.primpart-Tuple{Nemo.PolyElem{T}}'>#</a>
 **`Nemo.primpart`** &mdash; *Method*.
 
 
@@ -1671,16 +1498,8 @@ gcdx{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 > Return a tuple $(r, s, t)$ such that $r$ is the resultant of $a$ and $b$ and such that $r = a\times s + b\times t$.
 
 
-<a id='Base.gcdx-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}' href='#Base.gcdx-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}'>#</a>
+<a id='Base.gcdx-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}' href='#Base.gcdx-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}'>#</a>
 **`Base.gcdx`** &mdash; *Method*.
-
-
-
-```
-gcdx{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
-```
-
-> Return a tuple $(r, s, t)$ such that $r$ is the resultant of $a$ and $b$ and such that $r = a\times s + b\times t$.
 
 
 
@@ -1691,7 +1510,14 @@ gcdx{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
 > Return a tuple $(g, s, t)$ such that $g$ is the greatest common divisor of $a$ and $b$ and such that $r = a\times s + b\times t$.
 
 
-<a id='Nemo.gcdinv-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}' href='#Nemo.gcdinv-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}'>#</a>
+```
+gcdx{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+```
+
+> Return a tuple $(r, s, t)$ such that $r$ is the resultant of $a$ and $b$ and such that $r = a\times s + b\times t$.
+
+
+<a id='Nemo.gcdinv-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}' href='#Nemo.gcdinv-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}'>#</a>
 **`Nemo.gcdinv`** &mdash; *Method*.
 
 
@@ -1748,7 +1574,7 @@ evaluate{T <: RingElem}(a::PolyElem{T}, b::T)
 > Evaluate the polynomial $a$ at the value $b$ and return the result.
 
 
-<a id='Nemo.evaluate-Tuple{Nemo.PolyElem,Integer}' href='#Nemo.evaluate-Tuple{Nemo.PolyElem,Integer}'>#</a>
+<a id='Nemo.evaluate-Tuple{Nemo.PolyElem{T},Integer}' href='#Nemo.evaluate-Tuple{Nemo.PolyElem{T},Integer}'>#</a>
 **`Nemo.evaluate`** &mdash; *Method*.
 
 
@@ -1760,7 +1586,7 @@ evaluate(a::PolyElem, b::Integer)
 > Evaluate the polynomial $a$ at the value $b$ and return the result.
 
 
-<a id='Nemo.evaluate-Tuple{Nemo.PolyElem,Nemo.fmpz}' href='#Nemo.evaluate-Tuple{Nemo.PolyElem,Nemo.fmpz}'>#</a>
+<a id='Nemo.evaluate-Tuple{Nemo.PolyElem{T},Nemo.fmpz}' href='#Nemo.evaluate-Tuple{Nemo.PolyElem{T},Nemo.fmpz}'>#</a>
 **`Nemo.evaluate`** &mdash; *Method*.
 
 
@@ -1772,7 +1598,7 @@ evaluate(a::PolyElem, b::fmpz)
 > Evaluate the polynomial $a$ at the value $b$ and return the result.
 
 
-<a id='Nemo.compose-Tuple{Nemo.PolyElem,Nemo.PolyElem}' href='#Nemo.compose-Tuple{Nemo.PolyElem,Nemo.PolyElem}'>#</a>
+<a id='Nemo.compose-Tuple{Nemo.PolyElem{T},Nemo.PolyElem{T}}' href='#Nemo.compose-Tuple{Nemo.PolyElem{T},Nemo.PolyElem{T}}'>#</a>
 **`Nemo.compose`** &mdash; *Method*.
 
 
@@ -1824,7 +1650,7 @@ k = f(23)
 
 ## Derivative and integral
 
-<a id='Nemo.derivative-Tuple{Nemo.PolyElem}' href='#Nemo.derivative-Tuple{Nemo.PolyElem}'>#</a>
+<a id='Nemo.derivative-Tuple{Nemo.PolyElem{T}}' href='#Nemo.derivative-Tuple{Nemo.PolyElem{T}}'>#</a>
 **`Nemo.derivative`** &mdash; *Method*.
 
 
@@ -1836,7 +1662,7 @@ derivative(a::PolyElem)
 > Return the derivative of the polynomial $a$.
 
 
-<a id='Nemo.integral-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}' href='#Nemo.integral-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}'>#</a>
+<a id='Nemo.integral-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}' href='#Nemo.integral-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem{T}}}}'>#</a>
 **`Nemo.integral`** &mdash; *Method*.
 
 
@@ -1883,7 +1709,7 @@ resultant{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 > Return the resultant of the $a$ and $b$.
 
 
-<a id='Nemo.discriminant-Tuple{Nemo.PolyElem}' href='#Nemo.discriminant-Tuple{Nemo.PolyElem}'>#</a>
+<a id='Nemo.discriminant-Tuple{Nemo.PolyElem{T}}' href='#Nemo.discriminant-Tuple{Nemo.PolyElem{T}}'>#</a>
 **`Nemo.discriminant`** &mdash; *Method*.
 
 
@@ -1960,7 +1786,7 @@ newton_to_monomial!(g.coeffs, roots)
 
 ## Interpolation
 
-<a id='Nemo.interpolate-Tuple{Nemo.PolyRing,Array{T<:Nemo.RingElem,1},Array{T<:Nemo.RingElem,1}}' href='#Nemo.interpolate-Tuple{Nemo.PolyRing,Array{T<:Nemo.RingElem,1},Array{T<:Nemo.RingElem,1}}'>#</a>
+<a id='Nemo.interpolate-Tuple{Nemo.PolyRing{T},Array{T<:Nemo.RingElem,1},Array{T<:Nemo.RingElem,1}}' href='#Nemo.interpolate-Tuple{Nemo.PolyRing{T},Array{T<:Nemo.RingElem,1},Array{T<:Nemo.RingElem,1}}'>#</a>
 **`Nemo.interpolate`** &mdash; *Method*.
 
 
@@ -2228,7 +2054,7 @@ T = factor_distinct_deg((x + 1)*g*(x^5+x^3+x+1))
 
 The following special functions can be computed for any polynomial ring. Typically one uses the generator $x$ of a polynomial ring to get the respective special polynomials expressed in terms of that generator.
 
-<a id='Nemo.chebyshev_t-Tuple{Int64,Nemo.PolyElem}' href='#Nemo.chebyshev_t-Tuple{Int64,Nemo.PolyElem}'>#</a>
+<a id='Nemo.chebyshev_t-Tuple{Int64,Nemo.PolyElem{T}}' href='#Nemo.chebyshev_t-Tuple{Int64,Nemo.PolyElem{T}}'>#</a>
 **`Nemo.chebyshev_t`** &mdash; *Method*.
 
 
@@ -2240,7 +2066,7 @@ chebyshev_t(n::Int, x::PolyElem)
 > Return the Chebyshev polynomial of the first kind $T_n(x)$, defined by  $T_n(x) = \cos(n \cos^{-1}(x))$.
 
 
-<a id='Nemo.chebyshev_u-Tuple{Int64,Nemo.PolyElem}' href='#Nemo.chebyshev_u-Tuple{Int64,Nemo.PolyElem}'>#</a>
+<a id='Nemo.chebyshev_u-Tuple{Int64,Nemo.PolyElem{T}}' href='#Nemo.chebyshev_u-Tuple{Int64,Nemo.PolyElem{T}}'>#</a>
 **`Nemo.chebyshev_u`** &mdash; *Method*.
 
 
