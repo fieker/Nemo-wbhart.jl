@@ -397,6 +397,17 @@ end
 #   Ad hoc binary operators
 #
 ###############################################################################
+function *{T <: SeriesElem}(a::T, b::SeriesElem{T})
+   len = length(b)
+   z = parent(b)()
+   fit!(z, len)
+   set_prec!(z, precision(b))
+   for i = 1:len
+      setcoeff!(z, i - 1, a*coeff(b, i - 1))
+   end
+   set_length!(z, normalise(z, len))
+   return z
+end
 
 doc"""
     *{T <: RingElem}(a::T, b::SeriesElem{T})
@@ -446,11 +457,17 @@ function *{T <: RingElem}(a::fmpz, b::SeriesElem{T})
    return z
 end
 
+*{T <: SeriesElem}(a::SeriesElem{T}, b::MatElem{T}) = b*a
+
+#*{T <: SeriesElem, S <: SeriesElem}(a::S, b::FracElem{T}) = b*a
+
+*(a::SeriesElem{fmpz}, b::fmpz) = b*a
+
 doc"""
     *{T <: RingElem}(a::SeriesElem{T}, b::T)
 > Return $a\times b$.
 """
-*{T <: RingElem}(a::SeriesElem, b::T) = b*a
+*{T <: RingElem}(a::SeriesElem{T}, b::T) = b*a
 
 doc"""
     *{T <: RingElem}(a::SeriesElem{T}, b::Integer)
@@ -463,6 +480,8 @@ doc"""
 > Return $a\times b$.
 """
 *(a::SeriesElem, b::fmpz) = b*a
+
++(a::fmpz, b::SeriesElem{fmpz}) = parent(b)(a) + b
 
 doc"""
     +{T <: RingElem}(a::T, b::SeriesElem{T})
@@ -482,6 +501,8 @@ doc"""
 """
 +(a::fmpz, b::SeriesElem) = parent(b)(a) + b
 
++(a::SeriesElem{fmpz}, b::fmpz) = b + a
+
 doc"""
     +{T <: RingElem}(a::SeriesElem{T}, b::T)
 > Return $a + b$.
@@ -500,6 +521,8 @@ doc"""
 """
 +(a::SeriesElem, b::fmpz) = b + a
 
+-(a::fmpz, b::SeriesElem{fmpz}) = parent(b)(a) - b
+
 doc"""
     -{T <: RingElem}(a::T, b::SeriesElem{T})
 > Return $a - b$.
@@ -517,6 +540,8 @@ doc"""
 > Return $a - b$.
 """
 -(a::fmpz, b::SeriesElem) = parent(b)(a) - b
+
+-(a::SeriesElem{fmpz}, b::fmpz) = a - parent(a)(b)
 
 doc"""
     -{T <: RingElem}(a::SeriesElem{T}, b::T)
@@ -737,12 +762,18 @@ end
 #
 ###############################################################################
 
+==(x::SeriesElem{fmpz}, y::fmpz) = precision(x) == 0 ||
+           ((length(x) == 0 && y == 0) || (length(x) == 1 && coeff(x, 0) == y))
+
+
 doc"""
     =={T <: RingElem}(x::SeriesElem{T}, y::T)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 =={T <: RingElem}(x::SeriesElem{T}, y::T) = precision(x) == 0 ||
            ((length(x) == 0 && y == 0) || (length(x) == 1 && coeff(x, 0) == y))
+
+==(x::fmpz, y::SeriesElem{fmpz}) = y == x
 
 doc"""
     =={T <: RingElem}(x::T, y::SeriesElem{T})

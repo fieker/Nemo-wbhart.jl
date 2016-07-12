@@ -478,6 +478,21 @@ end
 #
 ###############################################################################
 
+function *(a::fmpz, b::PolyElem{fmpz})
+   len = length(b)
+   z = parent(b)()
+   fit!(z, len)
+   for i = 1:len
+      setcoeff!(z, i - 1, a*coeff(b, i - 1))
+   end
+   set_length!(z, normalise(z, len))
+   return z
+end
+
+*(b::PolyElem{fmpz}, a::fmpz) = a*b
+
+*{T <: SeriesElem}(a::T, b::PolyElem{T}) = a*b
+
 doc"""
     *{T <: RingElem}(a::T, b::PolyElem{T})
 > Return $a\times b$.
@@ -553,6 +568,10 @@ doc"""
 """
 +(a::Integer, b::PolyElem) = parent(b)(a) + b
 
++(b::PolyElem{fmpz}, a::fmpz) = a + b
+
++(a::fmpz, b::PolyElem{fmpz}) = parent(b)(a) + b
+
 doc"""
     +(a::fmpz, b::PolyElem)
 > Return $a + b$.
@@ -589,6 +608,8 @@ doc"""
 """
 -(a::Integer, b::PolyElem) = parent(b)(a) - b
 
+-(a::fmpz, b::PolyElem{fmpz}) = parent(b)(a) - b
+
 doc"""
     -(a::fmpz, b::PolyElem)
 > Return $a - b$.
@@ -606,6 +627,8 @@ doc"""
 > Return $a - b$.
 """
 -(a::PolyElem, b::Integer) = a - parent(a)(b)
+
+-(a::PolyElem{fmpz}, b::fmpz) = a - parent(a)(b)
 
 doc"""
     -(a::PolyElem, b::fmpz)
@@ -775,12 +798,17 @@ doc"""
 """
 ==(x::Integer, y::PolyElem) = y == x
 
+==(x::PolyElem{fmpz}, y::fmpz) = ((length(x) == 0 && y == 0)
+                        || (length(x) == 1 && coeff(x, 0) == y))
+
 doc"""
     ==(x::PolyElem, y::fmpz)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::PolyElem, y::fmpz) = ((length(x) == 0 && y == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
+
+==(x::fmpz, y::PolyElem{fmpz}) = y == x
 
 doc"""
     ==(x::fmpz, y::PolyElem)
@@ -1069,6 +1097,17 @@ function divexact(a::PolyElem, b::Integer)
    return z
 end
 
+function divexact(a::PolyElem{fmpz}, b::fmpz)
+   b == 0 && throw(DivideError())
+   z = parent(a)()
+   fit!(z, length(a))
+   for i = 1:length(a)
+      setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b))
+   end
+   set_length!(z, length(a))
+   return z
+end
+
 doc"""
     divexact(a::PolyElem, b::fmpz)
 > Return $a/b$ where the quotient is expected to be exact.
@@ -1309,6 +1348,22 @@ end
 #   Evaluation/composition
 #
 ###############################################################################
+
+function evaluate(a::PolyElem{fmpz}, b::fmpz)
+   i = length(a)
+   if i == 0
+       return zero(base_ring(a))
+   end
+   if i > 25
+      return subst(a, b)
+   end
+   z = coeff(a, i - 1)
+   while i > 1
+      i -= 1
+      z = z*b + coeff(a, i - 1)
+   end
+   return z
+end
 
 doc"""
     evaluate{T <: RingElem}(a::PolyElem{T}, b::T)
