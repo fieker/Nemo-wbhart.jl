@@ -10,6 +10,8 @@ using Libdl
 
 using Random
 
+using LoadFlint
+
 import Base: Array, abs, acos, acosh, asin, asinh, atan, atanh,
              bin, binomial, ceil, checkbounds, conj, convert, cmp, cos, cosh,
              cospi, cot, coth, dec, deepcopy, deepcopy_internal, denominator,
@@ -85,19 +87,22 @@ const pkgdir = realpath(joinpath(dirname(@__DIR__)))
 const libdir = joinpath(pkgdir, "deps", "usr", "lib")
 const bindir = joinpath(pkgdir, "deps", "usr", "bin")
 if Sys.iswindows()
-   const libgmp = joinpath(pkgdir, "deps", "usr", "bin", "libgmp-10")
+#   const libgmp = joinpath(pkgdir, "deps", "usr", "bin", "libgmp-10")
    const libmpfr = joinpath(pkgdir, "deps", "usr", "bin", "libmpfr-6")
-   const libflint = joinpath(pkgdir, "deps", "usr", "bin", "libflint")
+#   const libflint = joinpath(pkgdir, "deps", "usr", "bin", "libflint")
    const libarb = joinpath(pkgdir, "deps", "usr", "bin", "libarb")
    const libantic = joinpath(pkgdir, "deps", "usr", "bin", "libantic")
 
 else
-   const libgmp = joinpath(pkgdir, "deps", "usr", "lib", "libgmp")
+#   const libgmp = joinpath(pkgdir, "deps", "usr", "lib", "libgmp")
    const libmpfr = joinpath(pkgdir, "deps", "usr", "lib", "libmpfr")
-   const libflint = joinpath(pkgdir, "deps", "usr", "lib", "libflint")
+#   const libflint = joinpath(pkgdir, "deps", "usr", "lib", "libflint")
    const libarb = joinpath(pkgdir, "deps", "usr", "lib", "libarb")
    const libantic = joinpath(pkgdir, "deps", "usr", "lib", "libantic")
 end
+
+const libflint = LoadFlint.libflint
+const libgmp = LoadFlint.libgmp
 
 function flint_abort()
   error("Problem in the Flint-Subsystem")
