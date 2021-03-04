@@ -2670,7 +2670,7 @@ mutable struct FlintQadicField <: FlintLocalField
          QadicBase[(p, d, prec)] = z
       end
 
-      return z
+      return z, gen(z)
    end
 end
 
