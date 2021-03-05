@@ -2658,7 +2658,7 @@ mutable struct FlintQadicField <: FlintLocalField
          if haskey(QadicBase, a)
             Q = QadicBase[a]
             Q.prec_max = prec
-            return Q, gen(Q)
+            return Q
          end
       end
 
@@ -2674,7 +2674,7 @@ mutable struct FlintQadicField <: FlintLocalField
          QadicBase[(p, d)] = z
       end
 
-      return z, gen(z)
+      return z
    end
 end
 
